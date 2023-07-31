@@ -15,6 +15,11 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class MentionChat extends JavaPlugin implements Listener {
+    /*
+        Hiya! Welcome to the source code of this plugin
+        of course any contributions are welcome, just make a pull request or something lol
+        -JovannMC
+     */
 
     private HashMap<UUID, Long> nextMention = new HashMap<UUID, Long>();
     private Long nextMentionTime;
@@ -26,7 +31,15 @@ public final class MentionChat extends JavaPlugin implements Listener {
         Bukkit.getPluginManager().registerEvents(this, this);
         Metrics metrics = new Metrics(this, 19327);
 
-        Bukkit.getLogger().log(Level.INFO, "MentionChat has been enabled! Server version: " + getServerVersion());
+        Bukkit.getLogger().log(Level.INFO, "MentionChat v" +  getDescription().getVersion() + " has been enabled! Server version: " + getServerVersion());
+
+        // Check config version
+        if (getConfig().getInt("configVersion") != 1) {
+            Bukkit.getLogger().log(Level.SEVERE,
+                    "Your config.yml is outdated. Please regenerate the config.yml and reconfigure MentionChat.");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
 
         // If on a legacy server version and using the default sound, warn the console.
         String serverVersion = getServerVersion();
