@@ -28,13 +28,13 @@ public final class MentionChat extends JavaPlugin implements Listener {
 
         Bukkit.getLogger().log(Level.INFO, "MentionChat has been enabled! Server version: " + getServerVersion());
 
-        // If on a legacy server version and using the default config, warn the console.
+        // If on a legacy server version and using the default sound, warn the console.
         String serverVersion = getServerVersion();
         if (serverVersion.startsWith("v1_8") || serverVersion.startsWith("v1_7")) {
             if (getConfig().getString("mentionedSound").equals("ENTITY_ARROW_HIT_PLAYER")) {
                 unsupportedCheck = true;
                 Bukkit.getLogger().log(Level.WARNING,
-                        "You are using the default config, which isn't supported on this legacy version. Please update your config.yml to use a supported sound. An alternative sound (SUCCESSFUL_HIT) will be used instead.");
+                        "You are using the default sound (ENTITY_ARROW_HIT_PLAYER), which isn't supported on this legacy version. Please update your config.yml to use a supported sound. An alternative sound (SUCCESSFUL_HIT) will be used instead.");
             }
         }
     }
