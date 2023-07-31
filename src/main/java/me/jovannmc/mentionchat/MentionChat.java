@@ -97,6 +97,8 @@ public final class MentionChat extends JavaPlugin implements Listener {
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.getName() != mentioner.getName()) {
                 playMentionSound(p);
+                p.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                        getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
             }
         }
     }
