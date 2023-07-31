@@ -53,19 +53,22 @@ public final class MentionChat extends JavaPlugin implements Listener {
                     Player mentioned = Bukkit.getPlayerExact(playerName);
                     if (mentioned.isOnline() && mentioned != null) {
                         mentionUser(e.getPlayer(), Bukkit.getPlayerExact(playerName));
+                        return;
                     }
                 } else {
                     e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
                             getConfig().getString("noPermissionMessage")));
+                    return;
                 }
+                return;
             } else if (e.getMessage().toLowerCase().contains("@everyone")) {
                 if (e.getPlayer().hasPermission("mentionchat.mention.everyone")) {
                     mentionEveryone(e.getPlayer());
                 } else {
                     e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
                             getConfig().getString("noPermissionMessage")));
-                    return;
                 }
+                return;
             }
         }
     }
@@ -95,10 +98,10 @@ public final class MentionChat extends JavaPlugin implements Listener {
 
     private void mentionEveryone(Player mentioner) {
         for (Player p : Bukkit.getOnlinePlayers()) {
-            if (p.getName() != mentioner.getName()) {
-                playMentionSound(p);
+            if (!p.equals(mentioner)) {
                 p.sendMessage(ChatColor.translateAlternateColorCodes('&',
                         getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
+                playMentionSound(p);
             }
         }
     }
