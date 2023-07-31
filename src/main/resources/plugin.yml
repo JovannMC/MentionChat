@@ -3,19 +3,20 @@ version: '${project.version}'
 description: A Spigot plugin to mention/ping people in the chat!
 author: JovannMC
 main: me.jovannmc.mentionchat.MentionChat
+api-version: 1.13
 permissions:
   mentionchat.*:
-    description: Grants full access to everything in this plugin.
+    description: Gives access to all of MentionChat''s permissions.
     children:
       mentionchat.mention.others: true
       mentionchat.mention.everyone: true
       mentionchat.mention.bypass: true
   mentionchat.mention.others:
-    description: Allows you to mention other players
+    description: Allows players to mention other players in chat.
     default: true
   mentionchat.mention.everyone:
-    description: Allows you to mention everyone online
+    description: Allows players to mention everyone in chat.
     default: OP
   mentionchat.mention.bypass:
-    description: Allows you to bypass the cooldown between mentions.
+    description: Allows players to bypass the cooldown between mentions.
     default: OP
