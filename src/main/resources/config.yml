@@ -1,0 +1,27 @@
+# Thanks for downloading my plugin.
+
+# When you are mentioned, play this sound. Putting an invalid sound will result in no sound played when someone is mentioned, and a stacktrace/error will appear in the console.
+# IMPORTANT!
+# If you are on 1.9+, this sound will NOT work.
+# Please choose a sound from here:
+# https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+mentionedSound: SUCCESSFUL_HIT
+
+# When you are mentioned, send this message.
+# %player% is the placeholder of the player's name
+# You are allowed to use color codes such as &4
+mentionedMessage: "&6You were mentioned by &e%player%"
+
+# When you don't have permission to mention someone, send this message:
+# %player% is the placeholder of the player's name
+# You are allowed to use color codes such as &4
+noPermissionMessage: "&4You don't have permission to mention that person/everyone!"
+
+# How much time should the cooldown be in between mentions?
+# Used to prevent spamming.
+cooldown: 3
+
+# What should you see when you try to mention people during the cooldown?
+# %player% is the placeholder of the player's name
+# You are allowed to use color codes such as &4
+cooldownMessage: "&4Please don't try to spam mention people."
