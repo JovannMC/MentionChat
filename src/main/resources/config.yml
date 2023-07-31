@@ -13,7 +13,6 @@ mentionedSound: ENTITY_ARROW_HIT_PLAYER
 mentionedMessage: "&6You were mentioned by &e%player%"
 
 # When you don't have permission to mention someone, send this message:
-# %player% is the placeholder of the player's name
 # You are allowed to use color codes such as &4
 noPermissionMessage: "&4You don't have permission to mention them!"
 
@@ -22,6 +21,5 @@ noPermissionMessage: "&4You don't have permission to mention them!"
 cooldown: 3
 
 # What should you see when you try to mention people during the cooldown?
-# %player% is the placeholder of the player's name
 # You are allowed to use color codes such as &4
 cooldownMessage: "&4Please don't try to spam mention people."

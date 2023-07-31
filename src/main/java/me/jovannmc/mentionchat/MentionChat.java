@@ -56,14 +56,14 @@ public final class MentionChat extends JavaPlugin implements Listener {
                     }
                 } else {
                     e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
-                            getConfig().getString("noPermissionMessage").replace("%player%", e.getPlayer().getName())));
+                            getConfig().getString("noPermissionMessage")));
                 }
             } else if (e.getMessage().toLowerCase().contains("@everyone")) {
                 if (e.getPlayer().hasPermission("mentionchat.mention.everyone")) {
                     mentionEveryone(e.getPlayer());
                 } else {
                     e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
-                            getConfig().getString("noPermissionMessage").replace("%player%", e.getPlayer().getName())));
+                            getConfig().getString("noPermissionMessage")));
                     return;
                 }
             }
