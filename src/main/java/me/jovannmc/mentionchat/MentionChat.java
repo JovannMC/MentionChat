@@ -18,12 +18,25 @@ public final class MentionChat extends JavaPlugin implements Listener {
 
     private HashMap<UUID, Long> nextMention = new HashMap<UUID, Long>();
     private Long nextMentionTime;
+    private boolean unsupportedCheck = false;
 
     public void onEnable() {
         saveDefaultConfig();
         nextMentionTime = getConfig().getLong("cooldown");
         Bukkit.getPluginManager().registerEvents(this, this);
         Metrics metrics = new Metrics(this, 19327);
+
+        Bukkit.getLogger().log(Level.INFO, "MentionChat has been enabled! Server version: " + getServerVersion());
+
+        // If on a legacy server version and using the default config, warn the console.
+        String serverVersion = getServerVersion();
+        if (serverVersion.startsWith("v1_8") || serverVersion.startsWith("v1_7")) {
+            if (getConfig().getString("mentionedSound").equals("SUCCESSFUL_HIT")) {
+                unsupportedCheck = true;
+                Bukkit.getLogger().log(Level.WARNING,
+                        "You are using the default config, which isn't supported on this legacy version. Please update your config.yml to use a supported sound. An alternative sound (SUCCESSFUL_HIT) will be used instead.");
+            }
+        }
     }
 
     public void onDisable() {
@@ -38,31 +51,16 @@ public final class MentionChat extends JavaPlugin implements Listener {
             if (e.getMessage().contains("@" + playerName)) {
                 if (e.getPlayer().hasPermission("mentionchat.mention.others")) {
                     Player mentioned = Bukkit.getPlayerExact(playerName);
-
                     if (mentioned.isOnline() && mentioned != null) {
-                        mention(e.getPlayer(), Bukkit.getPlayerExact(playerName));
+                        mentionUser(e.getPlayer(), Bukkit.getPlayerExact(playerName));
                     }
-
                 } else {
                     e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
                             getConfig().getString("noPermissionMessage").replace("%player%", e.getPlayer().getName())));
                 }
             } else if (e.getMessage().toLowerCase().contains("@everyone")) {
                 if (e.getPlayer().hasPermission("mentionchat.mention.everyone")) {
-                    if (p.getName() != e.getPlayer().getName()) {
-                        p.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfig()
-                                .getString("mentionedMessage").replace("%player%", e.getPlayer().getName())));
-                        try {
-                            p.playSound(p.getLocation(), Sound.valueOf(getConfig().getString("mentionedSound")), 1.0F,
-                                    1.0F);
-                        } catch (Exception exception) {
-                            Bukkit.getLogger().log(Level.WARNING,
-                                    "An error occurred while trying to play the sound set in the config. This is most likely caused by an invalid sound in the config. Check the stacktrace for more info:");
-                            exception.printStackTrace();
-                        }
-                        return;
-
-                    }
+                    mentionEveryone(e.getPlayer());
                 } else {
                     e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
                             getConfig().getString("noPermissionMessage").replace("%player%", e.getPlayer().getName())));
@@ -72,35 +70,60 @@ public final class MentionChat extends JavaPlugin implements Listener {
         }
     }
 
-    public boolean mention(Player mentioner, Player mentioned) {
-        if (mentioned != null) {
-            if (nextMention.containsKey(mentioner.getUniqueId())) {
-                if (!mentioner.hasPermission("mentionchat.mention.bypass")) {
-                    long secondsLeft = ((nextMention.get(mentioner.getUniqueId()) / 1000) + nextMentionTime)
-                            - (System.currentTimeMillis() / 1000);
-                    if (secondsLeft > 0) {
-                        mentioner.sendMessage(
-                                ChatColor.translateAlternateColorCodes('&', getConfig().getString("cooldownMessage")));
-                        return true;
-                    }
+    private void mentionUser(Player mentioner, Player mentioned) {
+        if (mentioned == null) {
+            return;
+        }
+
+        if (nextMention.containsKey(mentioner.getUniqueId())) {
+            if (!mentioner.hasPermission("mentionchat.mention.bypass")) {
+                long secondsLeft = ((nextMention.get(mentioner.getUniqueId()) / 1000) + nextMentionTime)
+                        - (System.currentTimeMillis() / 1000);
+                if (secondsLeft > 0) {
+                    mentioner.sendMessage(
+                            ChatColor.translateAlternateColorCodes('&', getConfig().getString("cooldownMessage")));
                 }
             }
+        }
 
-            nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
-            mentioned.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                    getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
-            try {
-                mentioned.playSound(mentioned.getLocation(), Sound.valueOf(getConfig().getString("mentionedSound")),
-                        1.0F, 1.0F);
-            } catch (Exception exception) {
-                Bukkit.getLogger().log(Level.SEVERE,
-                        "An error occurred while trying to play the sound set in the config, check the stacktrace:");
-                exception.printStackTrace();
+        nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
+        mentioned.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
+        playMentionSound(mentioned);
+    }
+
+    private void mentionEveryone(Player mentioner) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            if (p.getName() != mentioner.getName()) {
+                p.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfig()
+                        .getString("mentionedMessage").replace("%player%", mentioner.getName())));
+                playMentionSound(p);
+            }
+        }
+    }
+
+    private void playMentionSound(Player mentioned) {
+        try {
+            Class<?> soundEnumClass = Class.forName("org.bukkit.Sound");
+            Object soundEnum;
+
+            if (unsupportedCheck) {
+                soundEnum = Enum.valueOf((Class<Enum>) soundEnumClass, "SUCCESSFUL_HIT");
+            } else {
+                soundEnum = Enum.valueOf((Class<Enum>) soundEnumClass, getConfig().getString("mentionedSound"));
             }
 
+            mentioned.playSound(mentioned.getLocation(), (Sound) soundEnum, 1.0f, 1.0f);
+        } catch (Exception exception) {
+            Bukkit.getLogger().log(Level.SEVERE,
+                    "An error occurred while trying to play the sound set in the config. This is most likely caused by an invalid sound in the config. Check the stacktrace for more info:");
+            exception.printStackTrace();
         }
-        return false;
+    }
 
+    public String getServerVersion() {
+        String packageName = Bukkit.getServer().getClass().getPackage().getName();
+        return packageName.substring(packageName.lastIndexOf('.') + 1);
     }
 
 }
