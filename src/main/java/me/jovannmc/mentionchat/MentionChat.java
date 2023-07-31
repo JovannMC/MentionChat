@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -22,13 +23,7 @@ public final class MentionChat extends JavaPlugin implements Listener {
         saveDefaultConfig();
         nextMentionTime = getConfig().getLong("cooldown");
         Bukkit.getPluginManager().registerEvents(this, this);
-
-        /* TODO: Add bStats support
-        int pluginId = ;
-        MetricsLite metrics = new MetricsLite(this, pluginId);
-        if (metrics.isEnabled()) {
-            Bukkit.getLogger().info("Metrics has been enabled for MentionChat. To opt-out, disable 'enabled' in plugins/bStats/config.yml");
-        }*/
+        Metrics metrics = new Metrics(this, 19327);
     }
 
     public void onDisable() {
