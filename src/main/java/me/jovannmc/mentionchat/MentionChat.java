@@ -82,6 +82,7 @@ public final class MentionChat extends JavaPlugin implements Listener {
                 if (secondsLeft > 0) {
                     mentioner.sendMessage(
                             ChatColor.translateAlternateColorCodes('&', getConfig().getString("cooldownMessage")));
+                    return;
                 }
             }
         }
@@ -95,8 +96,6 @@ public final class MentionChat extends JavaPlugin implements Listener {
     private void mentionEveryone(Player mentioner) {
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.getName() != mentioner.getName()) {
-                p.sendMessage(ChatColor.translateAlternateColorCodes('&', getConfig()
-                        .getString("mentionedMessage").replace("%player%", mentioner.getName())));
                 playMentionSound(p);
             }
         }
