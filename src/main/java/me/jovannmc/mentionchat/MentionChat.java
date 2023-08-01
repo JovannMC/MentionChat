@@ -33,6 +33,15 @@ public final class MentionChat extends JavaPlugin implements Listener {
 
         Bukkit.getLogger().log(Level.INFO, "MentionChat v" +  getDescription().getVersion() + " has been enabled! Server version: " + getServerVersion());
 
+        // Check for updates
+        new UpdateChecker(this, 111656).getVersion(version -> {
+            if (this.getDescription().getVersion().equals(version)) {
+                Bukkit.getLogger().info("You are on the latest version of MentionChat. (v" + version + ")");
+            } else {
+                Bukkit.getLogger().info("There is a new update available (v" + version + "). Please update at https://www.spigotmc.org/resources/111656/");
+            }
+        });
+
         // Check config version
         if (getConfig().getInt("configVersion") != 1) {
             Bukkit.getLogger().log(Level.SEVERE,
