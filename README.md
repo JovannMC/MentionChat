@@ -5,7 +5,7 @@ A lightweight Spigot plugin that allows players to mention other players in chat
 
 ## Description
 
-This is a simple and open source plugin that allows players to mention other players in chat, which is in basically every chat platform. You can configure the messages, mention sound, and cooldown time.
+This is a simple and open source plugin that allows players to mention other players in chat, which is in basically every chat platform. You can configure the messages, mention type and sound, cooldown time, and more!
 
 
 <details>
