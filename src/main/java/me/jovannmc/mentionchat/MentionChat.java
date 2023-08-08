@@ -74,13 +74,22 @@ public final class MentionChat extends JavaPlugin implements Listener {
 
     @EventHandler
     public void playerChatEvent(AsyncPlayerChatEvent e) {
+        // A HashSet is used as it prevents duplicate entries and is more efficient than an ArrayList
         HashSet<Player> mentionedPlayers = new HashSet<>();
         String[] words = e.getMessage().split(" ");
 
         // Split the message into words and check if any of them are a player's name
         // This is done to prevent similar names from causing issues (eg JovannMC and JovannMC2 being highlighted when only JovannMC2 was mentioned)
         for (String word : words) {
-            if (word.startsWith("@")) {
+            if (word.equalsIgnoreCase("@everyone")) {
+                if (e.getPlayer().hasPermission("mentionchat.mention.everyone")) {
+                    mentionEveryone(e, e.getPlayer());
+                } else {
+                    e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                            getConfig().getString("noPermissionMessage")));
+                }
+                return;
+            } else if (word.startsWith("@")) {
                 String playerName = word.substring(1);
                 Player mentionedPlayer = Bukkit.getPlayerExact(playerName);
 
@@ -90,17 +99,9 @@ public final class MentionChat extends JavaPlugin implements Listener {
             }
         }
 
-        if (e.getMessage().toLowerCase().contains("@everyone")) {
-            if (e.getPlayer().hasPermission("mentionchat.mention.everyone")) {
-                mentionEveryone(e, e.getPlayer());
-            } else {
-                e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
-                        getConfig().getString("noPermissionMessage")));
-            }
-            return;
+        if (mentionedPlayers.size() > 0) {
+            mentionUser(e, e.getPlayer(), mentionedPlayers);
         }
-
-        mentionUser(e, e.getPlayer(), mentionedPlayers);
     }
 
     private void mentionUser(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned) {
@@ -118,22 +119,32 @@ public final class MentionChat extends JavaPlugin implements Listener {
             }
         }
 
+        // Remove all recipients to send custom messages to each player, but lets the message still be logged in console
+        e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
         String type = getConfig().getString("mentionType");
 
+        // We use a HashSet here to track which players have already been sent a message, to prevent duplicate messages
+        HashSet<Player> sentMessages = new HashSet<>();
+
         if (type.equalsIgnoreCase("MESSAGE")) {
+            // Small bug here where with multiple mentions, the "mentionedMessage" may appear after the message instead of before.
+            // It's inconsistency caused by the loop but doesn't really need to be fixed.
             for (Player mentionedPlayer : mentioned) {
                 mentionedPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&',
                         getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
                 playMentionSound(mentionedPlayer);
+
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (!sentMessages.contains(player)) {
+                        // Add the player to the HashSet so they don't get sent the same message multiple times
+                        player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+                        sentMessages.add(player);
+                    }
+                }
             }
         } else if (type.equalsIgnoreCase("FORMAT")) {
-            String originalFormat = e.getFormat();
-
-            // We use a HashSet here to track which players have already been sent a message, to prevent duplicate messages
-            HashSet<Player> sentMessages = new HashSet<>();
-
             for (Player mentionedPlayer : mentioned) {
-                String mentionPattern = "@" + mentionedPlayer.getName() + "\\b";
+                String mentionPattern = "(?i)@" + mentionedPlayer.getName() + "\\b";
                 String mentionMessage = ChatColor.translateAlternateColorCodes('&',
                         getConfig().getString("mentionFormat").replace("%mention%", "@" + mentionedPlayer.getName()));
 
@@ -153,16 +164,15 @@ public final class MentionChat extends JavaPlugin implements Listener {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (!mentioned.contains(player) && !sentMessages.contains(player)) {
                         // Add the player to the HashSet so they don't get sent the same message multiple times
-                        player.sendMessage(originalFormat.replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+                        player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
                         sentMessages.add(player);
                     }
                 }
 
                 playMentionSound(mentionedPlayer);
-                mentionedPlayer.sendMessage(originalFormat.replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
+                mentionedPlayer.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
             }
 
-            e.setCancelled(true);
             nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
         } else {
             Bukkit.getLogger().log(Level.SEVERE, "Invalid mention type in MentionChat's config. (" + type + ")");
@@ -184,6 +194,8 @@ public final class MentionChat extends JavaPlugin implements Listener {
             }
         }
 
+        // Remove all recipients to send custom messages to each player, but lets the message still be logged in console
+        e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
         String type = getConfig().getString("mentionType");
 
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -193,16 +205,27 @@ public final class MentionChat extends JavaPlugin implements Listener {
                             getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
                     p.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
                 }
-                e.setCancelled(true);
             } else if (type.equalsIgnoreCase("FORMAT")) {
+                String mentionPattern = "(?i)@everyone\\b"; // (?i) makes the pattern case-insensitive
                 String mentionMessage = ChatColor.translateAlternateColorCodes('&',
                         getConfig().getString("mentionFormat").replace("%mention%", "@everyone"));
-                String newMessage = e.getMessage().replace("@everyone", mentionMessage);
+
+                // Like previously, we split the message into words and check if any of them match the mention pattern
+                String[] words = e.getMessage().split("\\s+");
+                StringBuilder newMessageBuilder = new StringBuilder();
+                for (String word : words) {
+                    if (word.matches(mentionPattern)) {
+                        newMessageBuilder.append(" ").append(mentionMessage);
+                    } else {
+                        newMessageBuilder.append(" ").append(word);
+                    }
+                }
+
+                String newMessage = newMessageBuilder.toString().trim();
 
                 if (!p.equals(mentioner)) {
                     p.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
                 }
-                e.setCancelled(true);
             } else {
                 Bukkit.getLogger().log(Level.SEVERE, "Invalid mention type in MentionChat's config. (" + type + ")");
             }
