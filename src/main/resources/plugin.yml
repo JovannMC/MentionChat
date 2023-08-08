@@ -1,16 +1,28 @@
 name: MentionChat
 version: '${project.version}'
-description: A Spigot plugin to mention/ping people in the chat!
+description: A simple plugin to mention other players in chat!
 author: JovannMC
 main: me.jovannmc.mentionchat.MentionChat
 api-version: 1.13
+commands:
+  mentionchat:
+    description: MentionChat's main command.
+    aliases: [mc]
 permissions:
   mentionchat.*:
-    description: Gives access to all of MentionChat''s permissions.
+    description: Gives access to all of MentionChat's permissions.
     children:
+      mentionchat.command.info: true
+      mentionchat.command.reload: true
       mentionchat.mention.others: true
       mentionchat.mention.everyone: true
       mentionchat.mention.bypass: true
+  mentionchat.command.info:
+    description: Allows players to view MentionChat's info and perform an update check.
+    default: true
+  mentionchat.command.reload:
+    description: Allows players to reload MentionChat's config.
+    default: OP
   mentionchat.mention.others:
     description: Allows players to mention other players in chat.
     default: true

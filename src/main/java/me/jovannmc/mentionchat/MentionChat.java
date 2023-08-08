@@ -1,8 +1,11 @@
 package me.jovannmc.mentionchat;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -22,28 +25,30 @@ public final class MentionChat extends JavaPlugin implements Listener {
      */
 
     private HashMap<UUID, Long> nextMention = new HashMap<UUID, Long>();
-    private Long nextMentionTime;
     private boolean unsupportedCheck = false;
+    private Long nextMentionTime;
 
     public void onEnable() {
         saveDefaultConfig();
-        nextMentionTime = getConfig().getLong("cooldown");
+        Bukkit.getPluginCommand("mentionchat").setExecutor(new MentionChatCommand());
         Bukkit.getPluginManager().registerEvents(this, this);
         Metrics metrics = new Metrics(this, 19327);
 
-        Bukkit.getLogger().log(Level.INFO, "MentionChat v" +  getDescription().getVersion() + " has been enabled! Server version: " + getServerVersion());
+        Bukkit.getLogger().log(Level.INFO, "MentionChat v" + getDescription().getVersion() + " has been enabled! Server version: " + getServerVersion());
 
         // Check for updates
-        new UpdateChecker(this, 111656).getVersion(version -> {
-            if (this.getDescription().getVersion().equals(version)) {
-                Bukkit.getLogger().info("You are on the latest version of MentionChat. (v" + version + ")");
-            } else {
-                Bukkit.getLogger().info("There is a new update available (v" + version + "). Please update at https://www.spigotmc.org/resources/111656/");
-            }
-        });
+        if (getConfig().getBoolean("checkForUpdates")) {
+            new UpdateChecker(this, 111656).getVersion(version -> {
+                if (this.getDescription().getVersion().equals(version)) {
+                    Bukkit.getLogger().info("You are on the latest version of MentionChat. (v" + version + ")");
+                } else {
+                    Bukkit.getLogger().info("There is a new update available for MentionChat (v" + version + "). Please update at https://www.spigotmc.org/resources/111656/");
+                }
+            });
+        }
 
         // Check config version
-        if (getConfig().getInt("configVersion") != 1) {
+        if (getConfig().getInt("configVersion") != 2) {
             Bukkit.getLogger().log(Level.SEVERE,
                     "Your config.yml is outdated. Please regenerate the config.yml and reconfigure MentionChat.");
             Bukkit.getPluginManager().disablePlugin(this);
@@ -61,68 +66,128 @@ public final class MentionChat extends JavaPlugin implements Listener {
         }
     }
 
-    public void onDisable() {
-        nextMention.clear();
-    }
+    public void onDisable() { nextMention.clear(); }
+
+    /*
+        Mentioning code
+    */
 
     @EventHandler
     public void playerChatEvent(AsyncPlayerChatEvent e) {
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            String playerName = p.getName();
+        ArrayList<Player> mentionedPlayers = new ArrayList<>();
+        String[] words = e.getMessage().split(" ");
 
-            if (e.getMessage().contains("@" + playerName)) {
-                if (e.getPlayer().hasPermission("mentionchat.mention.others")) {
-                    Player mentioned = Bukkit.getPlayerExact(playerName);
-                    if (mentioned.isOnline() && mentioned != null) {
-                        mentionUser(e.getPlayer(), Bukkit.getPlayerExact(playerName));
-                        return;
-                    }
-                } else {
-                    e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
-                            getConfig().getString("noPermissionMessage")));
-                    return;
+        // Split the message into words and check if any of them are a player's name
+        // This is done to prevent similar names from causing issues (eg JovannMC and JovannMC2 being mentioned when only JovannMC2 was mentioned)
+        for (String word : words) {
+            if (word.startsWith("@")) {
+                String playerName = word.substring(1);
+                Player mentionedPlayer = Bukkit.getPlayerExact(playerName);
+
+                if (mentionedPlayer != null && mentionedPlayer.isOnline() && !mentionedPlayers.contains(mentionedPlayer)) {
+                    mentionedPlayers.add(mentionedPlayer);
                 }
-                return;
-            } else if (e.getMessage().toLowerCase().contains("@everyone")) {
-                if (e.getPlayer().hasPermission("mentionchat.mention.everyone")) {
-                    mentionEveryone(e.getPlayer());
-                } else {
-                    e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
-                            getConfig().getString("noPermissionMessage")));
-                }
-                return;
             }
         }
-    }
 
-    private void mentionUser(Player mentioner, Player mentioned) {
-        if (mentioned == null) {
+        if (e.getMessage().toLowerCase().contains("@everyone")) {
+            if (e.getPlayer().hasPermission("mentionchat.mention.everyone")) {
+                mentionEveryone(e, e.getPlayer());
+            } else {
+                e.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',
+                        getConfig().getString("noPermissionMessage")));
+            }
             return;
         }
 
+        mentionUser(e, e.getPlayer(), mentionedPlayers);
+    }
+
+
+    private void mentionUser(AsyncPlayerChatEvent e, Player mentioner, ArrayList<Player> mentioned) {
+        // Cooldown logic
         if (nextMention.containsKey(mentioner.getUniqueId())) {
             if (!mentioner.hasPermission("mentionchat.mention.bypass")) {
+                nextMentionTime = getConfig().getLong("cooldown");
                 long secondsLeft = ((nextMention.get(mentioner.getUniqueId()) / 1000) + nextMentionTime)
                         - (System.currentTimeMillis() / 1000);
                 if (secondsLeft > 0) {
-                    mentioner.sendMessage(
-                            ChatColor.translateAlternateColorCodes('&', getConfig().getString("cooldownMessage")));
+                    mentioner.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                            getConfig().getString("cooldownMessage")));
                     return;
                 }
             }
         }
 
-        nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
-        mentioned.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
-        playMentionSound(mentioned);
+        String type = getConfig().getString("mentionType");
+
+        if (type.equalsIgnoreCase("MESSAGE")) {
+            for (Player mentionedPlayer : mentioned) {
+                mentionedPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                        getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
+            }
+        } else if (type.equalsIgnoreCase("FORMAT")) {
+            for (Player mentionedPlayer : mentioned) {
+                String originalFormat = e.getFormat();
+                String mentionPattern = "@" + mentionedPlayer.getName() + "\\b";
+                String mentionMessage = ChatColor.translateAlternateColorCodes('&',
+                        getConfig().getString("mentionFormat").replace("%mention%", "$0"));
+                String newMessage = e.getMessage().replaceAll(mentionPattern, mentionMessage);
+
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (mentioned.contains(player)) { continue; }
+                    if (!player.equals(mentionedPlayer)) {
+                        player.sendMessage(originalFormat.replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+                    }
+                }
+
+                playMentionSound(mentionedPlayer);
+                mentionedPlayer.sendMessage(originalFormat.replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
+                e.setCancelled(true);
+            }
+            nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
+        } else {
+            Bukkit.getLogger().log(Level.SEVERE, "Invalid mention type in MentionChat's config. (" + type + ")");
+        }
     }
 
-    private void mentionEveryone(Player mentioner) {
+    private void mentionEveryone(AsyncPlayerChatEvent e, Player mentioner) {
+        if (nextMention.containsKey(mentioner.getUniqueId())) {
+            if (!mentioner.hasPermission("mentionchat.mention.bypass")) {
+                nextMentionTime = getConfig().getLong("cooldown");
+                long secondsLeft = ((nextMention.get(mentioner.getUniqueId()) / 1000) + nextMentionTime)
+                        - (System.currentTimeMillis() / 1000);
+                if (secondsLeft > 0) {
+                    mentioner.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                            getConfig().getString("cooldownMessage")));
+                    return;
+                }
+            }
+        }
+
+        String type = getConfig().getString("mentionType");
+
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (!p.equals(mentioner)) {
-                p.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                        getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
+                if (type.equalsIgnoreCase("MESSAGE")) {
+                    p.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                            getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
+                } else if (type.equalsIgnoreCase("FORMAT")) {
+                    String originalFormat = e.getFormat();
+                    String mentionMessage = ChatColor.translateAlternateColorCodes('&',
+                            getConfig().getString("mentionFormat").replace("%mention%", "@everyone"));
+                    String newMessage = e.getMessage().replace("@everyone", mentionMessage);
+
+                        if (!p.equals(mentioner)) {
+                            p.sendMessage(originalFormat.replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
+                        }
+
+
+                    mentioner.sendMessage(originalFormat.replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+                    e.setCancelled(true);
+                }
+
+                nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
                 playMentionSound(p);
             }
         }
@@ -130,16 +195,19 @@ public final class MentionChat extends JavaPlugin implements Listener {
 
     private void playMentionSound(Player mentioned) {
         try {
+            String mentionedSound = getConfig().getString("mentionedSound");
             Class<?> soundEnumClass = Class.forName("org.bukkit.Sound");
             Object soundEnum;
 
             if (unsupportedCheck) {
                 soundEnum = Enum.valueOf((Class<Enum>) soundEnumClass, "SUCCESSFUL_HIT");
             } else {
-                soundEnum = Enum.valueOf((Class<Enum>) soundEnumClass, getConfig().getString("mentionedSound"));
+                soundEnum = Enum.valueOf((Class<Enum>) soundEnumClass, mentionedSound);
             }
 
-            mentioned.playSound(mentioned.getLocation(), (Sound) soundEnum, 1.0f, 1.0f);
+            if (mentionedSound != null && !mentionedSound.equalsIgnoreCase("NONE")) {
+                mentioned.playSound(mentioned.getLocation(), (Sound) soundEnum, 1.0f, 1.0f);
+            }
         } catch (Exception exception) {
             Bukkit.getLogger().log(Level.SEVERE,
                     "An error occurred while trying to play the sound set in the config. This is most likely caused by an invalid sound in the config. Check the stacktrace for more info:");
