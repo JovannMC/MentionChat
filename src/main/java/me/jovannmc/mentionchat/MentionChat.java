@@ -17,8 +17,8 @@ import java.util.logging.Level;
 
 public final class MentionChat extends JavaPlugin implements Listener {
     /*
-        Hiya! Welcome to the source code of this plugin
-        of course any contributions are welcome, just make a pull request or something lol
+        Hiya! Welcome to the source code of this plugin.
+        Of course any contributions are welcome, just make a pull request or something lol, roast my horrible code.
         -JovannMC
      */
 
@@ -200,17 +200,15 @@ public final class MentionChat extends JavaPlugin implements Listener {
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (type.equalsIgnoreCase("MESSAGE")) {
-                if (!p.equals(mentioner)) {
-                    p.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                            getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
-                    p.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
-                }
+                p.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                        getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
+                p.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
             } else if (type.equalsIgnoreCase("FORMAT")) {
-                String mentionPattern = "(?i)@everyone\\b"; // (?i) makes the pattern case-insensitive
+                String mentionPattern = "(?i)@everyone\\b";
                 String mentionMessage = ChatColor.translateAlternateColorCodes('&',
                         getConfig().getString("mentionFormat").replace("%mention%", "@everyone"));
 
-                // Like previously, we split the message into words and check if any of them match the mention pattern
+                // Like previously, we split the message into words so that it has to be @everyone, and also case-insensitive
                 String[] words = e.getMessage().split("\\s+");
                 StringBuilder newMessageBuilder = new StringBuilder();
                 for (String word : words) {
@@ -223,16 +221,13 @@ public final class MentionChat extends JavaPlugin implements Listener {
 
                 String newMessage = newMessageBuilder.toString().trim();
 
-                if (!p.equals(mentioner)) {
-                    p.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
-                }
+                p.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
             } else {
                 Bukkit.getLogger().log(Level.SEVERE, "Invalid mention type in MentionChat's config. (" + type + ")");
             }
             nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
             playMentionSound(p);
         }
-        mentioner.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
     }
 
     private void playMentionSound(Player mentioned) {
