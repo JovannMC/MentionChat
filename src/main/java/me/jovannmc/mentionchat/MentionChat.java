@@ -1,12 +1,5 @@
 package me.jovannmc.mentionchat;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -16,6 +9,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.UUID;
+import java.util.logging.Level;
 
 public final class MentionChat extends JavaPlugin implements Listener {
     /*
@@ -66,7 +64,9 @@ public final class MentionChat extends JavaPlugin implements Listener {
         }
     }
 
-    public void onDisable() { nextMention.clear(); }
+    public void onDisable() {
+        nextMention.clear();
+    }
 
     /*
         Mentioning code
@@ -74,11 +74,11 @@ public final class MentionChat extends JavaPlugin implements Listener {
 
     @EventHandler
     public void playerChatEvent(AsyncPlayerChatEvent e) {
-        ArrayList<Player> mentionedPlayers = new ArrayList<>();
+        HashSet<Player> mentionedPlayers = new HashSet<>();
         String[] words = e.getMessage().split(" ");
 
         // Split the message into words and check if any of them are a player's name
-        // This is done to prevent similar names from causing issues (eg JovannMC and JovannMC2 being mentioned when only JovannMC2 was mentioned)
+        // This is done to prevent similar names from causing issues (eg JovannMC and JovannMC2 being highlighted when only JovannMC2 was mentioned)
         for (String word : words) {
             if (word.startsWith("@")) {
                 String playerName = word.substring(1);
@@ -103,8 +103,7 @@ public final class MentionChat extends JavaPlugin implements Listener {
         mentionUser(e, e.getPlayer(), mentionedPlayers);
     }
 
-
-    private void mentionUser(AsyncPlayerChatEvent e, Player mentioner, ArrayList<Player> mentioned) {
+    private void mentionUser(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned) {
         // Cooldown logic
         if (nextMention.containsKey(mentioner.getUniqueId())) {
             if (!mentioner.hasPermission("mentionchat.mention.bypass")) {
@@ -127,24 +126,42 @@ public final class MentionChat extends JavaPlugin implements Listener {
                         getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
             }
         } else if (type.equalsIgnoreCase("FORMAT")) {
+            String originalFormat = e.getFormat();
+
+            // We use a HashSet here to track which players have already been sent a message, to prevent duplicate messages
+            HashSet<Player> sentMessages = new HashSet<>();
+
             for (Player mentionedPlayer : mentioned) {
-                String originalFormat = e.getFormat();
                 String mentionPattern = "@" + mentionedPlayer.getName() + "\\b";
                 String mentionMessage = ChatColor.translateAlternateColorCodes('&',
-                        getConfig().getString("mentionFormat").replace("%mention%", "$0"));
-                String newMessage = e.getMessage().replaceAll(mentionPattern, mentionMessage);
+                        getConfig().getString("mentionFormat").replace("%mention%", "@" + mentionedPlayer.getName()));
+
+                // Like previously, we split the message into words and check if any of them are a player's name to prevent duplicates
+                String[] words = e.getMessage().split("\\s+");
+                StringBuilder newMessageBuilder = new StringBuilder();
+                for (String word : words) {
+                    if (word.matches(mentionPattern)) {
+                        newMessageBuilder.append(" ").append(mentionMessage);
+                    } else {
+                        newMessageBuilder.append(" ").append(word);
+                    }
+                }
+
+                String newMessage = newMessageBuilder.toString().trim();
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (mentioned.contains(player)) { continue; }
-                    if (!player.equals(mentionedPlayer)) {
+                    if (!mentioned.contains(player) && !player.equals(mentioner) && !sentMessages.contains(player)) {
+                        // Add the player to the HashSet so they don't get sent the same message multiple times
                         player.sendMessage(originalFormat.replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+                        sentMessages.add(player);
                     }
                 }
 
                 playMentionSound(mentionedPlayer);
                 mentionedPlayer.sendMessage(originalFormat.replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
-                e.setCancelled(true);
             }
+
+            e.setCancelled(true);
             nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
         } else {
             Bukkit.getLogger().log(Level.SEVERE, "Invalid mention type in MentionChat's config. (" + type + ")");
@@ -152,6 +169,7 @@ public final class MentionChat extends JavaPlugin implements Listener {
     }
 
     private void mentionEveryone(AsyncPlayerChatEvent e, Player mentioner) {
+        // Cooldown logic
         if (nextMention.containsKey(mentioner.getUniqueId())) {
             if (!mentioner.hasPermission("mentionchat.mention.bypass")) {
                 nextMentionTime = getConfig().getLong("cooldown");
@@ -168,29 +186,25 @@ public final class MentionChat extends JavaPlugin implements Listener {
         String type = getConfig().getString("mentionType");
 
         for (Player p : Bukkit.getOnlinePlayers()) {
-            if (!p.equals(mentioner)) {
-                if (type.equalsIgnoreCase("MESSAGE")) {
-                    p.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                            getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
-                } else if (type.equalsIgnoreCase("FORMAT")) {
-                    String originalFormat = e.getFormat();
-                    String mentionMessage = ChatColor.translateAlternateColorCodes('&',
-                            getConfig().getString("mentionFormat").replace("%mention%", "@everyone"));
-                    String newMessage = e.getMessage().replace("@everyone", mentionMessage);
+            if (type.equalsIgnoreCase("MESSAGE")) {
+                p.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                        getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
+            } else if (type.equalsIgnoreCase("FORMAT")) {
+                String mentionMessage = ChatColor.translateAlternateColorCodes('&',
+                        getConfig().getString("mentionFormat").replace("%mention%", "@everyone"));
+                String newMessage = e.getMessage().replace("@everyone", mentionMessage);
 
-                        if (!p.equals(mentioner)) {
-                            p.sendMessage(originalFormat.replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
-                        }
-
-
-                    mentioner.sendMessage(originalFormat.replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
-                    e.setCancelled(true);
+                if (!p.equals(mentioner)) {
+                    p.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
                 }
 
-                nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
-                playMentionSound(p);
+                e.setCancelled(true);
             }
+            nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
+            playMentionSound(p);
         }
+
+        mentioner.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
     }
 
     private void playMentionSound(Player mentioned) {
