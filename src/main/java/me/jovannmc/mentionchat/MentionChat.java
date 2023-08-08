@@ -124,6 +124,7 @@ public final class MentionChat extends JavaPlugin implements Listener {
             for (Player mentionedPlayer : mentioned) {
                 mentionedPlayer.sendMessage(ChatColor.translateAlternateColorCodes('&',
                         getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
+                playMentionSound(mentionedPlayer);
             }
         } else if (type.equalsIgnoreCase("FORMAT")) {
             String originalFormat = e.getFormat();
@@ -150,7 +151,7 @@ public final class MentionChat extends JavaPlugin implements Listener {
                 String newMessage = newMessageBuilder.toString().trim();
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (!mentioned.contains(player) && !player.equals(mentioner) && !sentMessages.contains(player)) {
+                    if (!mentioned.contains(player) && !sentMessages.contains(player)) {
                         // Add the player to the HashSet so they don't get sent the same message multiple times
                         player.sendMessage(originalFormat.replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
                         sentMessages.add(player);
@@ -187,8 +188,12 @@ public final class MentionChat extends JavaPlugin implements Listener {
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (type.equalsIgnoreCase("MESSAGE")) {
-                p.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                        getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
+                if (!p.equals(mentioner)) {
+                    p.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                            getConfig().getString("mentionedMessage").replace("%player%", mentioner.getName())));
+                    p.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+                }
+                e.setCancelled(true);
             } else if (type.equalsIgnoreCase("FORMAT")) {
                 String mentionMessage = ChatColor.translateAlternateColorCodes('&',
                         getConfig().getString("mentionFormat").replace("%mention%", "@everyone"));
@@ -197,13 +202,13 @@ public final class MentionChat extends JavaPlugin implements Listener {
                 if (!p.equals(mentioner)) {
                     p.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
                 }
-
                 e.setCancelled(true);
+            } else {
+                Bukkit.getLogger().log(Level.SEVERE, "Invalid mention type in MentionChat's config. (" + type + ")");
             }
             nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
             playMentionSound(p);
         }
-
         mentioner.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
     }
 
