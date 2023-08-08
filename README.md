@@ -1,6 +1,6 @@
 # MentionChat
 
-![MentionChat in action](showcase.png)
+![MentionChat in action](showcase.png)<br>
 A lightweight Spigot plugin that allows players to mention other players in chat.
 
 ## Description
