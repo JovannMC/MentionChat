@@ -1,8 +1,10 @@
-package me.jovannmc.mentionchat;
+package me.jovannmc.mentionchat.commands;
 
+import me.jovannmc.mentionchat.MentionChat;
+import me.jovannmc.mentionchat.utils.UpdateChecker;
+import me.jovannmc.mentionchat.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -10,29 +12,28 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.xml.soap.Text;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MentionChatCommand implements CommandExecutor {
-    private JavaPlugin plugin = MentionChat.getPlugin(MentionChat.class);
+    private final JavaPlugin plugin = MentionChat.getPlugin(MentionChat.class);
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         String prefix = plugin.getConfig().getString("prefix");
-        if (args.length > 1) { sendMessage(sender, "&cInvalid usage. /mentionchat <reload>"); return false; }
+        if (args.length > 1) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat <reload>"); return false; }
 
         if (args.length == 0) {
-            if (!(sender instanceof Player)) { sendMessage(sender, "&cYou must be a player to use that command."); return false; }
-            if (!sender.hasPermission("mentionchat.command.info")) { sendMessage(sender, "&cYou don't have permission to use that command."); return false; }
+            if (!(sender instanceof Player)) { Utils.sendMessage(sender, "&cYou must be a player to use that command."); return false; }
+            if (!sender.hasPermission("mentionchat.command.info")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return false; }
             sendPluginInfo((Player) sender);
             return false;
         }
         if (args[0].equalsIgnoreCase("reload")) {
-            if (!sender.hasPermission("mentionchat.command.reload")) { sendMessage(sender, "&cYou don't have permission to use that command."); return false; }
+            if (!sender.hasPermission("mentionchat.command.reload")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return false; }
             plugin.reloadConfig();
-            sendMessage(sender, prefix + " &aReloaded the config.");
+            Utils.sendMessage(sender, prefix + " &aReloaded the config.");
         } else {
-            sendMessage(sender, " &cInvalid usage. /mentionchat <reload>");
+            Utils.sendMessage(sender, " &cInvalid usage. /mentionchat <reload>");
         }
 
         return false;
@@ -43,11 +44,7 @@ public class MentionChatCommand implements CommandExecutor {
         AtomicBoolean isUpToDate = new AtomicBoolean(false);
 
         new UpdateChecker(plugin, 111656).getVersion(version -> {
-            if (currentVersion.equals(version)) {
-                isUpToDate.set(true);
-            } else {
-                isUpToDate.set(false);
-            }
+            isUpToDate.set(currentVersion.equals(version));
 
             sendPluginInfoMessage(player, currentVersion, isUpToDate.get());
         });
@@ -67,9 +64,9 @@ public class MentionChatCommand implements CommandExecutor {
 
         TextComponent infoMessage = new TextComponent("");
 
-        infoMessage.addExtra(new TextComponent(ChatColor.translateAlternateColorCodes('&', separatorLine + lineSeparator)));
+        infoMessage.addExtra(new TextComponent(Utils.color(separatorLine + lineSeparator)));
 
-        TextComponent headerComponent = new TextComponent(ChatColor.translateAlternateColorCodes('&', "&a&lMentionChat &7v" + currentVersion + (isUpToDate ? ChatColor.GREEN + " (Latest)" : ChatColor.RED + " (Outdated)") + lineSeparator));
+        TextComponent headerComponent = new TextComponent(Utils.color("&a&lMentionChat &7v" + currentVersion + (isUpToDate ? ChatColor.GREEN + " (Latest)" : ChatColor.RED + " (Outdated)") + lineSeparator));
         headerComponent.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/mentionchat.111656/"));
         infoMessage.addExtra(new TextComponent(headerPadding));
         infoMessage.addExtra(headerComponent);
@@ -110,18 +107,14 @@ public class MentionChatCommand implements CommandExecutor {
         infoMessage.addExtra(new TextComponent(linksPadding));
         infoMessage.addExtra(linksGroupComponent);
 
-        infoMessage.addExtra(new TextComponent(ChatColor.translateAlternateColorCodes('&', lineSeparator + separatorLine)));
+        infoMessage.addExtra(new TextComponent(Utils.color(lineSeparator + separatorLine)));
 
         player.spigot().sendMessage(infoMessage);
     }
 
     private TextComponent createClickableMessage(String text, String url) {
-        TextComponent component = new TextComponent(ChatColor.translateAlternateColorCodes('&', text));
+        TextComponent component = new TextComponent(Utils.color(text));
         component.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
         return component;
-    }
-
-    private void sendMessage(CommandSender sender, String message) {
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
     }
 }

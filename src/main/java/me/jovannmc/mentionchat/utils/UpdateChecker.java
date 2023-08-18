@@ -1,4 +1,4 @@
-package me.jovannmc.mentionchat;
+package me.jovannmc.mentionchat.utils;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
