@@ -15,7 +15,7 @@ public class Utils {
     }
 
     public static boolean isLegacyVersion() {
-        String[] legacyVersions = {"v1_8", "v1_7", "v1_6", "v1_5", "v1_4"};
+        String[] legacyVersions = {"v1_8", "v1_7", "v1_6"};
         for (String legacyVersion : legacyVersions) {
             if (getServerVersion().startsWith(legacyVersion)) {
                 return true;
