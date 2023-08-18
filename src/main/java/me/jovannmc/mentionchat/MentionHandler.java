@@ -192,7 +192,6 @@ public class MentionHandler implements Listener {
         }
     }
 
-
     private FileConfiguration getConfig() {
         return plugin.getConfig();
     }
