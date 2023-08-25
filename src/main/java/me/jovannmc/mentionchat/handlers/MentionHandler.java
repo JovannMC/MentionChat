@@ -1,5 +1,6 @@
-package me.jovannmc.mentionchat;
+package me.jovannmc.mentionchat.handlers;
 
+import me.jovannmc.mentionchat.MentionChat;
 import me.jovannmc.mentionchat.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

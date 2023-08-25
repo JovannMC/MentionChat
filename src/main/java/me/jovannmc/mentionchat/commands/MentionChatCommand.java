@@ -19,38 +19,83 @@ public class MentionChatCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        String prefix = plugin.getConfig().getString("prefix");
-        if (args.length > 1) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat <reload>"); return false; }
+        if (args.length > 1) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat <help/settings/info/reload>"); return false; }
 
-        if (args.length == 0) {
-            if (!(sender instanceof Player)) { Utils.sendMessage(sender, "&cYou must be a player to use that command."); return false; }
-            if (!sender.hasPermission("mentionchat.command.info")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return false; }
-            sendPluginInfo((Player) sender);
-            return false;
-        }
-        if (args[0].equalsIgnoreCase("reload")) {
-            if (!sender.hasPermission("mentionchat.command.reload")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return false; }
-            plugin.reloadConfig();
-            Utils.sendMessage(sender, prefix + " &aReloaded the config.");
+        if (args.length == 0 || args[0].equalsIgnoreCase("info")) {
+            infoSubcommand(sender);
+        } else if (args[0].equalsIgnoreCase("reload")) {
+            reloadSubcommand(sender);
+        } else if (args[0].equalsIgnoreCase("help")){
+            helpSubcommand(sender);
+        } else if (args[0].equalsIgnoreCase("settings")) {
+            settingsSubcommand(sender, args);
         } else {
-            Utils.sendMessage(sender, " &cInvalid usage. /mentionchat <reload>");
+            Utils.sendMessage(sender, " &cInvalid usage. /mentionchat <help/settings/info/reload>");
         }
 
         return false;
     }
 
-    private void sendPluginInfo(Player player) {
-        String currentVersion = plugin.getDescription().getVersion();
-        AtomicBoolean isUpToDate = new AtomicBoolean(false);
+    /*
+        Reload subcommand
+    */
 
+    private void reloadSubcommand(CommandSender sender) {
+        if (!sender.hasPermission("mentionchat.command.reload")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return; }
+        String prefix = plugin.getConfig().getString("prefix");
+        plugin.reloadConfig();
+        Utils.sendMessage(sender, prefix + " &aReloaded the config.");
+    }
+
+    /*
+        Help subbcommand
+    */
+
+    private void helpSubcommand(CommandSender sender) {
+        if (!sender.hasPermission("mentionchat.command.help")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return; }
+        String prefix = plugin.getConfig().getString("prefix");
+        // Use TextComponents?
+    }
+
+    /*
+        Settings subcommand
+    */
+
+    private void settingsSubcommand(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("mentionchat.command.settings")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return; }
+        if (args.length == 1) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings <toggle/format/sound>"); }
+        String prefix = plugin.getConfig().getString("prefix");
+
+        if ((args.length == 2) && (args[1].equalsIgnoreCase("toggle"))) {
+            return;
+        }
+
+        if (args[1].equalsIgnoreCase("format")) {
+            return;
+        } else if (args[1].equalsIgnoreCase("sound")) {
+            return;
+        }
+
+        Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings <toggle/format/sound>");
+    }
+
+    /*
+        Info subcommand (no arguments)
+    */
+
+    private void infoSubcommand(CommandSender sender) {
+        if (!(sender instanceof Player)) { Utils.sendMessage(sender, "&cYou must be a player to use that command."); return; }
+        if (!sender.hasPermission("mentionchat.command.info")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return; }
+
+        String currentVersion = plugin.getDescription().getVersion();
+        AtomicBoolean isUpToDate = new AtomicBoolean(true);
         new UpdateChecker(plugin, 111656).getVersion(version -> {
             isUpToDate.set(currentVersion.equals(version));
-
-            sendPluginInfoMessage(player, currentVersion, isUpToDate.get());
+            sendPluginInfo((Player) sender, currentVersion, isUpToDate.get());
         });
     }
 
-    private void sendPluginInfoMessage(Player player, String currentVersion, boolean isUpToDate) {
+    private void sendPluginInfo(Player player, String currentVersion, boolean isUpToDate) {
         // yes, i manually did the padding to center the text
         // too bad
         String lineSeparator = "\n";
