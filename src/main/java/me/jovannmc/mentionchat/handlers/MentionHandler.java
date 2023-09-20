@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,7 +19,8 @@ import java.util.logging.Level;
 public class MentionHandler implements Listener {
     private final HashMap<UUID, Long> nextMention = new HashMap<>();
     private Long nextMentionTime;
-    private final JavaPlugin plugin = MentionChat.getPlugin(MentionChat.class);
+
+    private MentionChat plugin = MentionChat.getPlugin(MentionChat.class);
 
     @EventHandler
     public void playerChatEvent(AsyncPlayerChatEvent e) {

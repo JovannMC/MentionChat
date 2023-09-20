@@ -10,12 +10,12 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MentionChatCommand implements CommandExecutor {
-    private final JavaPlugin plugin = MentionChat.getPlugin(MentionChat.class);
+
+    MentionChat plugin = MentionChat.getPlugin(MentionChat.class);
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -48,7 +48,7 @@ public class MentionChatCommand implements CommandExecutor {
     }
 
     /*
-        Help subbcommand
+        Help subcommand
     */
 
     private void helpSubcommand(CommandSender sender) {
@@ -62,17 +62,35 @@ public class MentionChatCommand implements CommandExecutor {
     */
 
     private void settingsSubcommand(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player)) { Utils.sendMessage(sender, "&cYou must be a player to use that command."); return; }
         if (!sender.hasPermission("mentionchat.command.settings")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return; }
         if (args.length == 1) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings <toggle/format/sound>"); }
+        Player player = (Player) sender;
         String prefix = plugin.getConfig().getString("prefix");
 
         if ((args.length == 2) && (args[1].equalsIgnoreCase("toggle"))) {
+            plugin.getData().set(player.getUniqueId().toString() + ".toggle", !plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle"));
+            plugin.saveData();
+            Utils.sendMessage(sender, prefix + " &aToggled mentions " + (plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle") ? "on" : "off") + ".");
             return;
         }
 
         if (args[1].equalsIgnoreCase("format")) {
+            StringBuilder formatBuilder = new StringBuilder();
+            for (int i = 2; i < args.length; i++) {
+                formatBuilder.append(args[i]).append(" ");
+            }
+            String format = formatBuilder.toString();
+            plugin.getData().set(player.getUniqueId().toString() + ".format", format);
+            plugin.saveData();
+
+            Utils.sendMessage(sender, prefix + " &aSet your mention format to: " + format);
             return;
         } else if (args[1].equalsIgnoreCase("sound")) {
+            plugin.getData().set(player.getUniqueId().toString() + ".sound", args[2]);
+            plugin.saveData();
+
+            Utils.sendMessage(sender, prefix + " &aSet your mention sound to: " + args[2]);
             return;
         }
 
