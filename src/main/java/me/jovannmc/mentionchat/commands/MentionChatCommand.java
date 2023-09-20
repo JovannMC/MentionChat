@@ -52,6 +52,7 @@ public class MentionChatCommand implements CommandExecutor {
     private void helpSubcommand(CommandSender sender) {
         if (!sender.hasPermission("mentionchat.command.help")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return; }
         String prefix = plugin.getConfig().getString("prefix");
+        Utils.sendMessage(sender, prefix + " &aMentionChat Help");
         // Use TextComponents?
     }
 
@@ -74,7 +75,12 @@ public class MentionChatCommand implements CommandExecutor {
         }
 
         if (args[1].equalsIgnoreCase("format")) {
-            if (args.length < 3) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings format <format>"); return; }
+            if (args.length < 3) {
+                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings format <format>");
+                sender.sendMessage(ChatColor.RED + "Default format: " + ChatColor.GRAY + plugin.getConfig().get("mentionFormat"));
+                return;
+            }
+
             StringBuilder formatBuilder = new StringBuilder();
             for (int i = 2; i < args.length; i++) {
                 formatBuilder.append(args[i]).append(" ");
@@ -86,7 +92,12 @@ public class MentionChatCommand implements CommandExecutor {
             Utils.sendMessage(sender, prefix + " &aSet your mention format to: " + format);
             return;
         } else if (args[1].equalsIgnoreCase("sound")) {
-            if (args.length != 3) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings sound <sound>"); return; }
+            if (args.length != 3) {
+                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings sound <sound>");
+                Utils.sendMessage(sender, "&cDefault sound: &7" + plugin.getConfig().getString("mentionedSound"));
+                return;
+            }
+
             plugin.getData().set(player.getUniqueId().toString() + ".sound", args[2]);
             plugin.saveData();
 
