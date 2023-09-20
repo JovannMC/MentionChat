@@ -68,7 +68,7 @@ public class MentionHandler implements Listener {
             }
         }
 
-        // Remove all recipients to send custom messages to each player, but lets the message still be logged in console
+        // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
         e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
         String type = getConfig().getString("mentionType");
 
@@ -145,7 +145,7 @@ public class MentionHandler implements Listener {
             }
         }
 
-        // Remove all recipients to send custom messages to each player, but lets the message still be logged in console
+        // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
         e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
         String type = getConfig().getString("mentionType");
 

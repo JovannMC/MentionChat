@@ -68,7 +68,13 @@ public class MentionChatCommand implements CommandExecutor {
         String prefix = plugin.getConfig().getString("prefix");
 
         if ((args.length == 2) && (args[1].equalsIgnoreCase("toggle"))) {
-            plugin.getData().set(player.getUniqueId().toString() + ".toggle", !plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle"));
+            if (plugin.getData().contains(player.getUniqueId().toString() + ".toggle")) {
+                plugin.getData().set(player.getUniqueId().toString() + ".toggle", !plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle"));
+            } else {
+                // Player hasn't toggled mentions yet. By default mentions are on, so set it to false
+                plugin.getData().set(player.getUniqueId().toString() + ".toggle", false);
+            }
+
             plugin.saveData();
             Utils.sendMessage(sender, prefix + " &aToggled mentions " + (plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle") ? "on" : "off") + ".");
             return;
