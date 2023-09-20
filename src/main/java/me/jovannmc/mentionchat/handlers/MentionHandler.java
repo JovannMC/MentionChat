@@ -193,7 +193,8 @@ public class MentionHandler implements Listener {
 
             Sound soundEnum;
 
-            if (Utils.isLegacyVersion()) {
+            if (Utils.isLegacyVersion() && mentionedSound.equalsIgnoreCase("ENTITY_ARROW_HIT_PLAYER")) {
+                // On legacy version and is using default sound which isn't supported
                 soundEnum = Sound.valueOf("SUCCESSFUL_HIT");
             } else {
                 soundEnum = Sound.valueOf(mentionedSound);
