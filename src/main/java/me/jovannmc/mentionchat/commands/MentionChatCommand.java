@@ -19,8 +19,6 @@ public class MentionChatCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (args.length > 1) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat <help/settings/info/reload>"); return false; }
-
         if (args.length == 0 || args[0].equalsIgnoreCase("info")) {
             infoSubcommand(sender);
         } else if (args[0].equalsIgnoreCase("reload")) {
@@ -64,7 +62,7 @@ public class MentionChatCommand implements CommandExecutor {
     private void settingsSubcommand(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) { Utils.sendMessage(sender, "&cYou must be a player to use that command."); return; }
         if (!sender.hasPermission("mentionchat.command.settings")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return; }
-        if (args.length == 1) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings <toggle/format/sound>"); }
+        if (args.length == 1) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings <toggle/format/sound>"); return; }
         Player player = (Player) sender;
         String prefix = plugin.getConfig().getString("prefix");
 
@@ -76,6 +74,7 @@ public class MentionChatCommand implements CommandExecutor {
         }
 
         if (args[1].equalsIgnoreCase("format")) {
+            if (args.length < 3) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings format <format>"); return; }
             StringBuilder formatBuilder = new StringBuilder();
             for (int i = 2; i < args.length; i++) {
                 formatBuilder.append(args[i]).append(" ");
@@ -87,6 +86,7 @@ public class MentionChatCommand implements CommandExecutor {
             Utils.sendMessage(sender, prefix + " &aSet your mention format to: " + format);
             return;
         } else if (args[1].equalsIgnoreCase("sound")) {
+            if (args.length != 3) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings sound <sound>"); return; }
             plugin.getData().set(player.getUniqueId().toString() + ".sound", args[2]);
             plugin.saveData();
 
