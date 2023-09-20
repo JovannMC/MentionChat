@@ -205,11 +205,12 @@ public class MentionHandler implements Listener {
             }
         } catch (Exception e) {
             if (customSound) {
-                Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to play the sound set by the player " + mentioned.getName() + " with UUID " + mentioned.getUniqueId() + ". (" + plugin.getData().getString(mentioned.getUniqueId().toString() + ".sound") + ").");
-                Bukkit.getLogger().log(Level.SEVERE, "This is most likely because the sound set by the player is invalid.", e);
+                Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to play the sound (" + plugin.getData().getString(mentioned.getUniqueId().toString() + ".sound") + ") for the player " + mentioned.getName() + " with UUID " + mentioned.getUniqueId(), e);
+                Utils.sendMessage(mentioned, "&cAn error occurred while trying to play your custom sound (" + plugin.getData().getString(mentioned.getUniqueId().toString() + ".sound") + "). Please contact an administrator.");
             } else {
-                Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to play the sound set in the config. (" + getConfig().getString("mentionedSound") + ").");
-                Bukkit.getLogger().log(Level.SEVERE, "This is most likely because the sound set in the config is invalid.", e);
+                Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to play the config sound (" + getConfig().getString("mentionedSound") + ").");
+                Bukkit.getLogger().log(Level.SEVERE, "The sound set in the config may be invalid.", e);
+                Utils.sendMessage(mentioned, "&cAn error occurred while trying to play the mention sound. (" + getConfig().getString("mentionedSound") + "). Please contact an administrator.");
             }
         }
     }
