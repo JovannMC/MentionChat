@@ -84,7 +84,7 @@ public class MentionHandler implements Listener {
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (!sentMessages.contains(player)) {
-                        // Add the player to the HashSet so they don't get sent the same message multiple times
+                        // Add the player to the HashSet, so they don't get sent the same message multiple times
                         player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
                         sentMessages.add(player);
                     }
@@ -93,7 +93,13 @@ public class MentionHandler implements Listener {
         } else if (type.equalsIgnoreCase("FORMAT")) {
             for (Player mentionedPlayer : mentioned) {
                 String mentionPattern = "(?i)@" + mentionedPlayer.getName() + "\\b";
-                String mentionMessage = Utils.color(getConfig().getString("mentionFormat").replace("%mention%", "@" + mentionedPlayer.getName()));
+                String mentionMessage;
+
+                if (plugin.getData().contains(mentionedPlayer.getUniqueId().toString() + ".format")) {
+                    mentionMessage = ChatColor.translateAlternateColorCodes('&', plugin.getData().getString(mentionedPlayer.getUniqueId().toString() + ".format").replace("%mention%", "@" + mentionedPlayer.getName()));
+                } else {
+                    mentionMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("mentionFormat").replace("%mention%", "@" + mentionedPlayer.getName()));
+                }
 
                 // Like previously, we split the message into words and check if any of them are a player's name to prevent duplicates
                 String[] words = e.getMessage().split("\\s+");
@@ -110,7 +116,7 @@ public class MentionHandler implements Listener {
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (!mentioned.contains(player) && !sentMessages.contains(player)) {
-                        // Add the player to the HashSet so they don't get sent the same message multiple times
+                        // Add the player to the HashSet, so they don't get sent the same message multiple times
                         player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
                         sentMessages.add(player);
                     }
@@ -174,8 +180,16 @@ public class MentionHandler implements Listener {
     }
 
     private void playMentionSound(Player mentioned) {
+        boolean customSound = false;
         try {
-            String mentionedSound = getConfig().getString("mentionedSound");
+            String mentionedSound;
+
+            if (plugin.getData().contains(mentioned.getUniqueId().toString() + ".sound")) {
+                mentionedSound = plugin.getData().getString(mentioned.getUniqueId().toString() + ".sound");
+                customSound = true;
+            } else {
+                mentionedSound = getConfig().getString("mentionedSound");
+            }
 
             Sound soundEnum;
 
@@ -189,7 +203,13 @@ public class MentionHandler implements Listener {
                 mentioned.playSound(mentioned.getLocation(), soundEnum, 1.0f, 1.0f);
             }
         } catch (Exception e) {
-            Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to play the sound set in the config. This is most likely caused by an invalid sound in the config.", e);
+            if (customSound) {
+                Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to play the sound set by the player " + mentioned.getName() + " with UUID " + mentioned.getUniqueId() + ". (" + plugin.getData().getString(mentioned.getUniqueId().toString() + ".sound") + ").");
+                Bukkit.getLogger().log(Level.SEVERE, "This is most likely because the sound set by the player is invalid.", e);
+            } else {
+                Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to play the sound set in the config. (" + getConfig().getString("mentionedSound") + ").");
+                Bukkit.getLogger().log(Level.SEVERE, "This is most likely because the sound set in the config is invalid.", e);
+            }
         }
     }
 
