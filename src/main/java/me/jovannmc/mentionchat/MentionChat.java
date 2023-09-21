@@ -25,7 +25,6 @@ public class MentionChat extends JavaPlugin implements Listener {
         -JovannMC
      */
 
-
     private final File configFile = new File(getDataFolder() + File.separator, "config.yml");
     private final File dataFile = new File(getDataFolder() + File.separator, "data.yml");
 

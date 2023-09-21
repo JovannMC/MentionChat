@@ -12,7 +12,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.w3c.dom.Text;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -75,7 +74,7 @@ public class MentionChatCommand implements CommandExecutor {
             infoMessage.addExtra(lineSeparator + lineSeparator);
             infoMessage.addExtra(createHoverableCommand("&6/mentionchat (info): &rView MentionChat's info and perform an update check", "/mentionchat info", hoverText));
             infoMessage.addExtra(lineSeparator);
-            infoMessage.addExtra(createHoverableCommand("&6/mentionchat help: &rView this help page", "/mentionchat help", hoverText));
+            infoMessage.addExtra(createHoverableCommand("&6/mentionchat help (1/2): &rView this help page", "/mentionchat help", hoverText));
             infoMessage.addExtra(lineSeparator);
             infoMessage.addExtra(createHoverableCommand("&6/mentionchat reload: &rReload MentionChat's config", "/mentionchat reload", hoverText));
             infoMessage.addExtra(lineSeparator);
