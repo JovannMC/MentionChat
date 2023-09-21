@@ -19,7 +19,7 @@ mentionFormat: "&6&l%mention%&r"
 
 # When you are mentioned, play this sound. No sound will be played when someone is mentioned and an error will appear if an invalid sound is chosen.
 # To disable the sound, put NONE.
-mentionedSound: ENTITY_ARROW_HIT_PLAYER
+mentionedSound: SUCCESSFUL_HIT
 
 # How much time (in seconds) should there be in between mentions?
 # Used to prevent mention spam.

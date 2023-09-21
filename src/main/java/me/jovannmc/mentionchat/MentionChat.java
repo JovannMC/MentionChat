@@ -13,6 +13,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.logging.Level;
 
 public class MentionChat extends JavaPlugin implements Listener {
@@ -52,22 +55,33 @@ public class MentionChat extends JavaPlugin implements Listener {
 
     public void configTasks() {
         boolean firstRun = false;
-
         if (!configFile.exists()) {
             configFile.getParentFile().mkdirs();
-            saveDefaultConfig();
+            if (Utils.isLegacyVersion()) {
+                // Save config-legacy.yml
+                saveResource("config-legacy.yml", false);
+                // Copy contents from config-legacy.yml to config.yml
+                try {
+                    Files.copy(new File(getDataFolder(), "config-legacy.yml").toPath(), new File(getDataFolder(), "config.yml").toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+                    // Delete the config-legacy.yml file
+                    File legacyConfigFile = new File(getDataFolder(), "config-legacy.yml");
+                    if (legacyConfigFile.exists()) {
+                        legacyConfigFile.delete();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                // Save config.yml
+                saveResource("config.yml", false);
+            }
             firstRun = true;
         }
 
         if (!dataFile.exists()) {
             dataFile.getParentFile().mkdir();
             saveData();
-        }
-
-        // If on a legacy server version and using the default sound, warn the console.
-        if (Utils.isLegacyVersion() && getConfig().getString("mentionedSound").equals("ENTITY_ARROW_HIT_PLAYER")) {
-            Bukkit.getLogger().log(Level.WARNING,
-                    "You are using the default sound (ENTITY_ARROW_HIT_PLAYER), which isn't supported on this legacy version. Please update your config.yml to use a supported sound. An alternative sound (SUCCESSFUL_HIT) will be used instead.");
         }
 
         // Check config version
