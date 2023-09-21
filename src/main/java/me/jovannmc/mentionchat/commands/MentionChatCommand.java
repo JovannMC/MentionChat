@@ -24,7 +24,7 @@ public class MentionChatCommand implements CommandExecutor {
         } else if (args[0].equalsIgnoreCase("reload")) {
             reloadSubcommand(sender);
         } else if (args[0].equalsIgnoreCase("help")){
-            helpSubcommand(sender);
+            helpSubcommand(sender, args);
         } else if (args[0].equalsIgnoreCase("settings")) {
             settingsSubcommand(sender, args);
         } else {
@@ -49,11 +49,41 @@ public class MentionChatCommand implements CommandExecutor {
         Help subcommand
     */
 
-    private void helpSubcommand(CommandSender sender) {
-        if (!sender.hasPermission("mentionchat.command.help")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return; }
-        String prefix = plugin.getConfig().getString("prefix");
-        Utils.sendMessage(sender, prefix + " &aMentionChat Help");
-        // Use TextComponents?
+    private void helpSubcommand(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player)) {
+            Utils.sendMessage(sender, "&cYou must be a player to use that command.");
+            return;
+        }
+        if (!sender.hasPermission("mentionchat.command.help")) {
+            Utils.sendMessage(sender, "&cYou don't have permission to use that command.");
+            return;
+        }
+
+        TextComponent infoMessage = new TextComponent("");
+        String lineSeparator = "\n";
+        if (args.length == 1 || (args.length == 2 && args[1].equalsIgnoreCase("1"))) {
+            infoMessage.addExtra(new TextComponent(Utils.color("&8----------------&a&lMentionChat Help &7(1/2)&8---------------" + lineSeparator)));
+            infoMessage.addExtra(lineSeparator);
+            infoMessage.addExtra(createClickableCommand("&6/mentionchat (info): &rView MentionChat's info and perform an update check" + lineSeparator, "/mentionchat info"));
+            infoMessage.addExtra(createClickableCommand("&6/mentionchat help: &rView this help page" + lineSeparator, "/mentionchat help "));
+            infoMessage.addExtra(createClickableCommand("&6/mentionchat reload: &rReload MentionChat's config" + lineSeparator, "/mentionchat reload"));
+            infoMessage.addExtra(createClickableCommand("&6/mentionchat settings <toggle/format/sound>: &rChange your MentionChat settings" + lineSeparator, "/mentionchat settings "));
+            infoMessage.addExtra(lineSeparator);
+            infoMessage.addExtra(new TextComponent(Utils.color("&8-----------------------------------------------------")));
+        } else if (args.length == 2 && args[1].equalsIgnoreCase("2")) {
+            infoMessage.addExtra(new TextComponent(Utils.color("&8----------------&a&lMentionChat Help &7(2/2)&8---------------" + lineSeparator)));
+            infoMessage.addExtra(lineSeparator);
+            infoMessage.addExtra(createClickableCommand("&6/mentionchat settings toggle: &rChange if you can be mentioned" + lineSeparator, "/mentionchat settings toggle"));
+            infoMessage.addExtra(createClickableCommand("&6/mentionchat settings format <format>: &rChange your mention format" + lineSeparator, "/mentionchat settings format "));
+            infoMessage.addExtra(createClickableCommand("&6/mentionchat settings sound <sound>: &rChange your mention sound" + lineSeparator, "/mentionchat settings sound "));
+            infoMessage.addExtra(lineSeparator);
+            infoMessage.addExtra(new TextComponent(Utils.color("&8-----------------------------------------------------")));
+        } else {
+            Utils.sendMessage(sender, "&cInvalid usage. /mentionchat help (page)");
+            return;
+        }
+
+        sender.spigot().sendMessage(infoMessage);
     }
 
     /*
@@ -137,7 +167,7 @@ public class MentionChatCommand implements CommandExecutor {
         // yes, i manually did the padding to center the text
         // too bad
         String lineSeparator = "\n";
-        String separatorLine = "&8&m-----------------------------------------------------";
+        String separatorLine = "&8-----------------------------------------------------";
 
         String headerPadding = "                     ";
         String descPadding = "         ";
@@ -199,5 +229,11 @@ public class MentionChatCommand implements CommandExecutor {
         TextComponent component = new TextComponent(Utils.color(text));
         component.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
         return component;
+    }
+
+    private TextComponent createClickableCommand(String text, String command) {
+        TextComponent clickableText = new TextComponent(Utils.color(text));
+        clickableText.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command));
+        return clickableText;
     }
 }
