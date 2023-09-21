@@ -66,7 +66,11 @@ public class MentionChatCommand implements CommandExecutor {
         TextComponent hoverText = new TextComponent("Click to enter the command");
         String lineSeparator = "\n";
         if (args.length == 1 || (args.length == 2 && args[1].equalsIgnoreCase("1"))) {
-            infoMessage.addExtra(Utils.color("&8--------------&a&lMentionChat Help &7(1/2)&8--------------"));
+            if (Utils.isLegacyVersion()) {
+                infoMessage.addExtra(Utils.color("&8--------------&a&lMentionChat Help &7(1/2)&8--------------"));
+            } else {
+                infoMessage.addExtra(Utils.color("&8----------------&a&lMentionChat Help &7(1/2)&8---------------"));
+            }
 
             infoMessage.addExtra(lineSeparator + lineSeparator);
             infoMessage.addExtra(createHoverableCommand("&6/mentionchat (info): &rView MentionChat's info and perform an update check", "/mentionchat info", hoverText));
@@ -84,7 +88,11 @@ public class MentionChatCommand implements CommandExecutor {
                 infoMessage.addExtra(new TextComponent(Utils.color("&8-----------------------------------------------------")));
             }
         } else if (args.length == 2 && args[1].equalsIgnoreCase("2")) {
-            infoMessage.addExtra(Utils.color("&8--------------&a&lMentionChat Help &7(2/2)&8--------------"));
+            if (Utils.isLegacyVersion()) {
+                infoMessage.addExtra(Utils.color("&8--------------&a&lMentionChat Help &7(2/2)&8--------------"));
+            } else {
+                infoMessage.addExtra(Utils.color("&8----------------&a&lMentionChat Help &7(2/2)&8---------------"));
+            }
 
             infoMessage.addExtra(lineSeparator + lineSeparator);
             infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings toggle: &rChange if you can be mentioned", "/mentionchat settings toggle", hoverText));
@@ -191,7 +199,6 @@ public class MentionChatCommand implements CommandExecutor {
                 boolean isUpToDate = currentVersion.equals(version.get());
                 sendPluginInfo((Player) sender, currentVersion, isUpToDate ? "true" : "false");
             } else {
-                // Handle the case where an error occurred during the update check
                 Utils.sendMessage(sender, "&cAn error occurred while checking for updates.");
                 sendPluginInfo((Player) sender, currentVersion, "error");
             }
