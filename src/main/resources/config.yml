@@ -8,13 +8,9 @@ prefix: "&6[&eMentionChat&6]&r"
 # You can always check for updates manually with /mentionchat.
 checkForUpdates: true
 
-# If you chose FORMAT, what should the format for the message be?
+# What should the format for the message be?
 # %mention% is the placeholder of the mentioned player or everyone.
 mentionFormat: "&6&l%mention%&r"
-
-# If you chose MESSAGE, what message should be sent?
-# %player% is the placeholder of the player's name
-mentionedMessage: "&6You were mentioned by &e%player%"
 
 # When you are mentioned, play this sound. No sound will be played when someone is mentioned and an error will appear if an invalid sound is chosen.
 # To disable the sound, put NONE.
@@ -29,6 +25,7 @@ mentionedSound: ENTITY_ARROW_HIT_PLAYER
 cooldown: 3
 
 # What should you see when you try to mention someone who has mentions disabled, or has the permission mentionchat.mention.exempt
+# %mention% is the placeholder of the mentioned player(s).
 playerMentionDisabled: "&4%mention% has mentions disabled!"
 
 # What should you see when you try to mention people during the cooldown?

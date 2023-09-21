@@ -64,7 +64,7 @@ public class MentionHandler implements Listener {
             }
         }
         if (!playersToRemove.isEmpty()) {
-            mentioned.removeAll(playersToRemove);
+            playersToRemove.forEach(mentioned::remove);
             List<String> names = new ArrayList<>();
             for (Player player : playersToRemove) {
                 names.add(player.getName());
