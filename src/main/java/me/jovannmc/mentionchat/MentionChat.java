@@ -22,11 +22,11 @@ public class MentionChat extends JavaPlugin implements Listener {
         -JovannMC
      */
 
-    private File configFile = new File(getDataFolder() + File.separator, "config.yml");
-    private File dataFile = new File(getDataFolder() + File.separator, "data.yml");
 
-    private FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-    private FileConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
+    private final File configFile = new File(getDataFolder() + File.separator, "config.yml");
+    private final File dataFile = new File(getDataFolder() + File.separator, "data.yml");
+
+    private final FileConfiguration data = YamlConfiguration.loadConfiguration(dataFile);
 
     public void onEnable() {
         configTasks();
@@ -53,13 +53,13 @@ public class MentionChat extends JavaPlugin implements Listener {
     public void configTasks() {
         boolean firstRun = false;
 
-        if (!configFile.exists() && configFile != null) {
+        if (!configFile.exists()) {
             configFile.getParentFile().mkdirs();
             saveDefaultConfig();
             firstRun = true;
         }
 
-        if (!dataFile.exists() && dataFile != null) {
+        if (!dataFile.exists()) {
             dataFile.getParentFile().mkdir();
             saveData();
         }
@@ -72,8 +72,7 @@ public class MentionChat extends JavaPlugin implements Listener {
 
         // Check config version
         if (getConfig().getInt("configVersion") != 3 && !firstRun) {
-            Bukkit.getLogger().log(Level.SEVERE,
-                    "Your config.yml is outdated. Please regenerate the config.yml and reconfigure MentionChat.");
+            Bukkit.getLogger().log(Level.SEVERE, "Your config.yml is outdated. Please regenerate the config.yml and reconfigure MentionChat.");
             Bukkit.getPluginManager().disablePlugin(this);
         }
     }

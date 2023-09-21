@@ -157,7 +157,7 @@ public class MentionChatCommand implements CommandExecutor {
     }
 
     /*
-        Info subcommand (no arguments)
+        Info subcommand (/mentionchat OR /mentionchat info)
     */
 
     private void infoSubcommand(CommandSender sender) {

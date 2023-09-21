@@ -8,6 +8,11 @@ prefix: "&6[&eMentionChat&6]&r"
 # You can always check for updates manually with /mentionchat.
 checkForUpdates: true
 
+# What should be placed at the beginning of the message to mention somebody?
+# To disable the mention symbol (and use just the player's name), leave it blank.
+# Note: leaving it blank can cause any player with the permission mentionchat.mention.everyone to trigger an everyone mention unintentionally.
+mentionSymbol: "@"
+
 # What should the format for the message be?
 # %mention% is the placeholder of the mentioned player or everyone.
 mentionFormat: "&6&l%mention%&r"

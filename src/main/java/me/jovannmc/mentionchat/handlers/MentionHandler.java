@@ -22,6 +22,7 @@ public class MentionHandler implements Listener {
 
     @EventHandler
     public void playerChatEvent(AsyncPlayerChatEvent e) {
+        String mentionSymbol = getConfig().getString("mentionSymbol");
         // A HashSet is used as it prevents duplicate entries and is more efficient than an ArrayList
         HashSet<Player> mentionedPlayers = new HashSet<>();
         String[] words = e.getMessage().split(" ");
@@ -31,18 +32,25 @@ public class MentionHandler implements Listener {
         // Split the message into words and check if any of them are a player's name
         // This is done to prevent similar names from causing issues (eg JovannMC and JovannMC2 being highlighted when only JovannMC2 was mentioned)
         for (String word : words) {
-            if (word.equalsIgnoreCase("@everyone")) {
+            if (mentionSymbol.isEmpty()) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (word.equalsIgnoreCase(player.getName())) {
+                        mentionedPlayers.add(player);
+                    }
+                }
+            }
+
+            if (word.equalsIgnoreCase(mentionSymbol + "everyone")) {
                 if (e.getPlayer().hasPermission("mentionchat.mention.everyone")) {
                     mentionEveryone(e, mentioner);
                 } else {
                     Utils.sendMessage(mentioner, getConfig().getString("noPermissionMessage"));
                 }
                 return;
-            } else if (word.startsWith("@")) {
-                String playerName = word.substring(1);
-                Player mentionedPlayer = Bukkit.getPlayerExact(playerName);
-
-                if (mentionedPlayer != null && mentionedPlayer.isOnline()) {
+            } else if (word.startsWith(mentionSymbol)) {
+                String playerName = word.substring(mentionSymbol.length());
+                Player mentionedPlayer = Bukkit.getPlayer(playerName);
+                if (mentionedPlayer != null) {
                     mentionedPlayers.add(mentionedPlayer);
                 }
             }
@@ -94,13 +102,14 @@ public class MentionHandler implements Listener {
         HashSet<Player> sentMessages = new HashSet<>();
 
         for (Player mentionedPlayer : mentioned) {
-            String mentionPattern = "(?i)@" + mentionedPlayer.getName() + "\\b";
+            String mentionSymbol = getConfig().getString("mentionSymbol");
+            String mentionPattern = "(?i)" + mentionSymbol + mentionedPlayer.getName() + "\\b";
             String mentionMessage;
 
             if (plugin.getData().contains(mentionedPlayer.getUniqueId().toString() + ".format")) {
-                mentionMessage = ChatColor.translateAlternateColorCodes('&', plugin.getData().getString(mentionedPlayer.getUniqueId().toString() + ".format").replace("%mention%", "@" + mentionedPlayer.getName()));
+                mentionMessage = ChatColor.translateAlternateColorCodes('&', plugin.getData().getString(mentionedPlayer.getUniqueId().toString() + ".format").replace("%mention%", mentionSymbol + mentionedPlayer.getName()));
             } else {
-                mentionMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("mentionFormat").replace("%mention%", "@" + mentionedPlayer.getName()));
+                mentionMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("mentionFormat").replace("%mention%", mentionSymbol + mentionedPlayer.getName()));
             }
 
             // Like previously, we split the message into words and check if any of them are a player's name to prevent duplicates
@@ -145,8 +154,9 @@ public class MentionHandler implements Listener {
         e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
 
         for (Player p : Bukkit.getOnlinePlayers()) {
-            String mentionPattern = "(?i)@everyone\\b";
-            String mentionMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("mentionFormat").replace("%mention%", "@everyone"));
+            String mentionSymbol = getConfig().getString("mentionSymbol");
+            String mentionPattern = "(?i)" + mentionSymbol + "everyone\\b";
+            String mentionMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("mentionFormat").replace("%mention%", mentionSymbol + "everyone"));
 
             // Like previously, we split the message into words so that it has to be @everyone, and also case-insensitive
             String[] words = e.getMessage().split("\\s+");
