@@ -64,20 +64,22 @@ public class MentionHandler implements Listener {
     private void mentionUser(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned) {
         // Check if player has mentions disabled
         List<Player> playersToRemove = new ArrayList<>();
-        for (Player mentionedPlayer : mentioned) {
-            if (plugin.getData().contains(mentionedPlayer.getUniqueId().toString() + ".toggle") && !plugin.getData().getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle")) {
-                playersToRemove.add(mentionedPlayer);
-            } else if (mentionedPlayer.hasPermission("mentionchat.mention.exempt")) {
-                playersToRemove.add(mentionedPlayer);
+        if (!mentioner.hasPermission("mentionchat.mention.bypass") || !mentioner.hasPermission("mentionchat.mention.bypass.toggle")) {
+            for (Player mentionedPlayer : mentioned) {
+                if (plugin.getData().contains(mentionedPlayer.getUniqueId().toString() + ".toggle") && !plugin.getData().getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle")) {
+                    playersToRemove.add(mentionedPlayer);
+                } else if (mentionedPlayer.hasPermission("mentionchat.mention.exempt")) {
+                    playersToRemove.add(mentionedPlayer);
+                }
             }
-        }
-        if (!playersToRemove.isEmpty()) {
-            playersToRemove.forEach(mentioned::remove);
-            List<String> names = new ArrayList<>();
-            for (Player player : playersToRemove) {
-                names.add(player.getName());
+            if (!playersToRemove.isEmpty()) {
+                playersToRemove.forEach(mentioned::remove);
+                List<String> names = new ArrayList<>();
+                for (Player player : playersToRemove) {
+                    names.add(player.getName());
+                }
+                Utils.sendMessage(mentioner, getConfig().getString("playerMentionDisabled").replace("%mention%", String.join(", ", names)));
             }
-            Utils.sendMessage(mentioner, getConfig().getString("playerMentionDisabled").replace("%mention%", String.join(", ", names)));
         }
 
         // Check if player has permission to mention
@@ -88,7 +90,7 @@ public class MentionHandler implements Listener {
 
         // Cooldown logic
         if (nextMention.containsKey(mentioner.getUniqueId())) {
-            if (!mentioner.hasPermission("mentionchat.mention.bypass")) {
+            if (!mentioner.hasPermission("mentionchat.mention.bypass") || !mentioner.hasPermission("mentionchat.mention.bypass.cooldown")) {
                 nextMentionTime = getConfig().getLong("cooldown");
                 long secondsLeft = ((nextMention.get(mentioner.getUniqueId()) / 1000) + nextMentionTime) - (System.currentTimeMillis() / 1000);
                 if (secondsLeft > 0) { Utils.sendMessage(mentioner, getConfig().getString("cooldownMessage")); return; }

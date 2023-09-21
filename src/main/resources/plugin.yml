@@ -6,11 +6,11 @@ main: me.jovannmc.mentionchat.MentionChat
 api-version: 1.13
 commands:
   mentionchat:
-    description: MentionChat's main command.
+    description: MentionChat's main command. Use /mentionchat help for more info.
     aliases: [mc]
 permissions:
   mentionchat.*:
-    description: Gives access to all of MentionChat's permissions.
+    description: Gives access to all of MentionChat's permissions and commands (except for mentionchat.mention.exempt).
     children:
       mentionchat.command.info: true
       mentionchat.command.reload: true
@@ -50,8 +50,14 @@ permissions:
     description: Allows players to mention everyone in chat.
     default: OP
   mentionchat.mention.bypass:
+    description: Allows players to bypass the cooldown between mentions and mention toggles.
+    default: OP
+  mentionchat.mention.bypass.cooldown:
     description: Allows players to bypass the cooldown between mentions.
     default: OP
+  mentionchat.mention.bypass.toggle:
+    description: Allows players to bypass the mention toggle.
+    default: OP
   mentionchat.mention.exempt:
-    description: Allows players to be exempt from being mentioned.
+    description: Allows players to be exempt from being mentioned, no matter their mention toggle.
     default: false
