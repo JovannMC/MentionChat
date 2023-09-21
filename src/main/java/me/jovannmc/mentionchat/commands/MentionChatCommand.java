@@ -4,6 +4,7 @@ import me.jovannmc.mentionchat.MentionChat;
 import me.jovannmc.mentionchat.utils.UpdateChecker;
 import me.jovannmc.mentionchat.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -11,6 +12,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.w3c.dom.Text;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -61,20 +63,20 @@ public class MentionChatCommand implements CommandExecutor {
         }
 
         TextComponent infoMessage = new TextComponent("");
+        TextComponent hoverText = new TextComponent("Click to enter the command");
         String lineSeparator = "\n";
         if (args.length == 1 || (args.length == 2 && args[1].equalsIgnoreCase("1"))) {
-            if (Utils.isLegacyVersion()) {
-                infoMessage.addExtra(new TextComponent(Utils.color("&8--------------&a&lMentionChat Help &7(1/2)&8--------------" + lineSeparator)));
-            } else {
-                infoMessage.addExtra(new TextComponent(Utils.color("&8----------------&a&lMentionChat Help &7(1/2)&8---------------" + lineSeparator)));
-            }
+            infoMessage.addExtra(Utils.color("&8--------------&a&lMentionChat Help &7(1/2)&8--------------"));
 
+            infoMessage.addExtra(lineSeparator + lineSeparator);
+            infoMessage.addExtra(createHoverableCommand("&6/mentionchat (info): &rView MentionChat's info and perform an update check", "/mentionchat info", hoverText));
             infoMessage.addExtra(lineSeparator);
-            infoMessage.addExtra(createClickableCommand("&6/mentionchat (info): &rView MentionChat's info and perform an update check" + lineSeparator, "/mentionchat info"));
-            infoMessage.addExtra(createClickableCommand("&6/mentionchat help: &rView this help page" + lineSeparator, "/mentionchat help "));
-            infoMessage.addExtra(createClickableCommand("&6/mentionchat reload: &rReload MentionChat's config" + lineSeparator, "/mentionchat reload"));
-            infoMessage.addExtra(createClickableCommand("&6/mentionchat settings <toggle/format/sound>: &rChange your MentionChat settings" + lineSeparator, "/mentionchat settings "));
+            infoMessage.addExtra(createHoverableCommand("&6/mentionchat help: &rView this help page", "/mentionchat help", hoverText));
             infoMessage.addExtra(lineSeparator);
+            infoMessage.addExtra(createHoverableCommand("&6/mentionchat reload: &rReload MentionChat's config", "/mentionchat reload", hoverText));
+            infoMessage.addExtra(lineSeparator);
+            infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings <toggle/format/sound>: &rChange your MentionChat settings", "/mentionchat settings ", hoverText));
+            infoMessage.addExtra(lineSeparator + lineSeparator);
 
             if (Utils.isLegacyVersion()) {
                 infoMessage.addExtra(new TextComponent(Utils.color("&8--------------------------------------------------")));
@@ -82,16 +84,16 @@ public class MentionChatCommand implements CommandExecutor {
                 infoMessage.addExtra(new TextComponent(Utils.color("&8-----------------------------------------------------")));
             }
         } else if (args.length == 2 && args[1].equalsIgnoreCase("2")) {
-            if (Utils.isLegacyVersion()) {
-                infoMessage.addExtra(new TextComponent(Utils.color("&8--------------&a&lMentionChat Help &7(2/2)&8--------------" + lineSeparator)));
-            } else {
-                infoMessage.addExtra(new TextComponent(Utils.color("&8----------------&a&lMentionChat Help &7(2/2)&8---------------" + lineSeparator)));
-            }
+            infoMessage.addExtra(Utils.color("&8--------------&a&lMentionChat Help &7(2/2)&8--------------"));
+
+            infoMessage.addExtra(lineSeparator + lineSeparator);
+            infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings toggle: &rChange if you can be mentioned", "/mentionchat settings toggle", hoverText));
             infoMessage.addExtra(lineSeparator);
-            infoMessage.addExtra(createClickableCommand("&6/mentionchat settings toggle: &rChange if you can be mentioned" + lineSeparator, "/mentionchat settings toggle"));
-            infoMessage.addExtra(createClickableCommand("&6/mentionchat settings format <format>: &rChange your mention format" + lineSeparator, "/mentionchat settings format "));
-            infoMessage.addExtra(createClickableCommand("&6/mentionchat settings sound <sound>: &rChange your mention sound" + lineSeparator, "/mentionchat settings sound "));
+            infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings format <format>: &rChange your mention format", "/mentionchat settings format ", hoverText));
             infoMessage.addExtra(lineSeparator);
+            infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings sound <sound>: &rChange your mention sound", "/mentionchat settings sound ", hoverText));
+            infoMessage.addExtra(lineSeparator + lineSeparator);
+
             if (Utils.isLegacyVersion()) {
                 infoMessage.addExtra(new TextComponent(Utils.color("&8--------------------------------------------------")));
             } else {
@@ -184,14 +186,19 @@ public class MentionChatCommand implements CommandExecutor {
         if (!sender.hasPermission("mentionchat.command.info")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return; }
 
         String currentVersion = plugin.getDescription().getVersion();
-        AtomicBoolean isUpToDate = new AtomicBoolean(true);
         new UpdateChecker(plugin, 111656).getVersion(version -> {
-            isUpToDate.set(currentVersion.equals(version));
-            sendPluginInfo((Player) sender, currentVersion, isUpToDate.get());
+            if (version.isPresent()) {
+                boolean isUpToDate = currentVersion.equals(version.get());
+                sendPluginInfo((Player) sender, currentVersion, isUpToDate ? "true" : "false");
+            } else {
+                // Handle the case where an error occurred during the update check
+                Utils.sendMessage(sender, "&cAn error occurred while checking for updates.");
+                sendPluginInfo((Player) sender, currentVersion, "error");
+            }
         });
     }
 
-    private void sendPluginInfo(Player player, String currentVersion, boolean isUpToDate) {
+    private void sendPluginInfo(Player player, String currentVersion, String isUpToDate) {
         // yes, i manually did the padding to center the text
         // too bad
         String lineSeparator = "\n";
@@ -207,7 +214,14 @@ public class MentionChatCommand implements CommandExecutor {
 
         infoMessage.addExtra(new TextComponent(Utils.color(separatorLine + lineSeparator)));
 
-        TextComponent headerComponent = new TextComponent(Utils.color("&a&lMentionChat &7v" + currentVersion + (isUpToDate ? ChatColor.GREEN + " (Latest)" : ChatColor.RED + " (Outdated)") + lineSeparator));
+        TextComponent headerComponent = new TextComponent("");
+        if (isUpToDate.equalsIgnoreCase("true")) {
+            headerComponent.addExtra(Utils.color("&a&lMentionChat &7v" + currentVersion + ChatColor.GREEN + " (Latest)" + lineSeparator));
+        } else if (isUpToDate.equalsIgnoreCase("false")) {
+            headerComponent.addExtra(Utils.color("&a&lMentionChat &7v" + currentVersion + ChatColor.RED + " (Outdated)" + lineSeparator));
+        } else {
+            headerComponent.addExtra(Utils.color("&a&lMentionChat &7v" + currentVersion + ChatColor.RED + " (Error)" + lineSeparator));
+        }
         headerComponent.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/mentionchat.111656/"));
         infoMessage.addExtra(new TextComponent(headerPadding));
         infoMessage.addExtra(headerComponent);
@@ -259,9 +273,10 @@ public class MentionChatCommand implements CommandExecutor {
         return component;
     }
 
-    private TextComponent createClickableCommand(String text, String command) {
-        TextComponent clickableText = new TextComponent(Utils.color(text));
-        clickableText.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command));
-        return clickableText;
+    private TextComponent createHoverableCommand(String text, String command, TextComponent hoverText) {
+        TextComponent component = new TextComponent(Utils.color(text));
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{hoverText}));
+        component.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command));
+        return component;
     }
 }
