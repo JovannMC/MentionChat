@@ -194,18 +194,14 @@ public class MentionChatCommand implements CommandExecutor {
         if (!sender.hasPermission("mentionchat.command.info")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return; }
 
         String currentVersion = plugin.getDescription().getVersion();
+        AtomicBoolean isUpToDate = new AtomicBoolean(true);
         new UpdateChecker(plugin, 111656).getVersion(version -> {
-            if (version.isPresent()) {
-                boolean isUpToDate = currentVersion.equals(version.get());
-                sendPluginInfo((Player) sender, currentVersion, isUpToDate ? "true" : "false");
-            } else {
-                Utils.sendMessage(sender, "&cAn error occurred while checking for updates.");
-                sendPluginInfo((Player) sender, currentVersion, "error");
-            }
+            isUpToDate.set(currentVersion.equals(version));
+            sendPluginInfo((Player) sender, currentVersion, isUpToDate.get());
         });
     }
 
-    private void sendPluginInfo(Player player, String currentVersion, String isUpToDate) {
+    private void sendPluginInfo(Player player, String currentVersion, boolean isUpToDate) {
         // yes, i manually did the padding to center the text
         // too bad
         String lineSeparator = "\n";
@@ -221,14 +217,7 @@ public class MentionChatCommand implements CommandExecutor {
 
         infoMessage.addExtra(new TextComponent(Utils.color(separatorLine + lineSeparator)));
 
-        TextComponent headerComponent = new TextComponent("");
-        if (isUpToDate.equalsIgnoreCase("true")) {
-            headerComponent.addExtra(Utils.color("&a&lMentionChat &7v" + currentVersion + ChatColor.GREEN + " (Latest)" + lineSeparator));
-        } else if (isUpToDate.equalsIgnoreCase("false")) {
-            headerComponent.addExtra(Utils.color("&a&lMentionChat &7v" + currentVersion + ChatColor.RED + " (Outdated)" + lineSeparator));
-        } else {
-            headerComponent.addExtra(Utils.color("&a&lMentionChat &7v" + currentVersion + ChatColor.RED + " (Error)" + lineSeparator));
-        }
+        TextComponent headerComponent = new TextComponent(Utils.color("&a&lMentionChat &7v" + currentVersion + (isUpToDate ? ChatColor.GREEN + " (Latest)" : ChatColor.RED + " (Outdated)") + lineSeparator));
         headerComponent.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.spigotmc.org/resources/mentionchat.111656/"));
         infoMessage.addExtra(new TextComponent(headerPadding));
         infoMessage.addExtra(headerComponent);

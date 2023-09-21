@@ -6,7 +6,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Optional;
 import java.util.Scanner;
 import java.util.function.Consumer;
 
@@ -19,16 +18,13 @@ public class UpdateChecker {
         this.resourceId = resourceId;
     }
 
-    public void getVersion(final Consumer<Optional<String>> consumer) {
+    public void getVersion(final Consumer<String> consumer) {
         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
             try (InputStream is = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + this.resourceId).openStream(); Scanner scan = new Scanner(is)) {
                 if (scan.hasNext()) {
-                    consumer.accept(Optional.of(scan.next()));
-                } else {
-                    consumer.accept(Optional.empty()); // No version information found
+                    consumer.accept(scan.next());
                 }
             } catch (IOException e) {
-                consumer.accept(Optional.empty()); // Error occurred while checking for updates
                 plugin.getLogger().info("Unable to check for updates: " + e.getMessage());
             }
         });
