@@ -89,7 +89,10 @@ public class MentionChatCommand implements CommandExecutor {
 
             StringBuilder formatBuilder = new StringBuilder();
             for (int i = 2; i < args.length; i++) {
-                formatBuilder.append(args[i]).append(" ");
+                formatBuilder.append(args[i]);
+                if (i < args.length - 1) {
+                    formatBuilder.append(" ");
+                }
             }
             String format = formatBuilder.toString();
             plugin.getData().set(player.getUniqueId().toString() + ".format", format);
