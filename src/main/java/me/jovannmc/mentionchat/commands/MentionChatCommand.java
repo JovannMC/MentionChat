@@ -6,6 +6,7 @@ import me.jovannmc.mentionchat.utils.Utils;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -133,6 +134,14 @@ public class MentionChatCommand implements CommandExecutor {
         } else if (args[1].equalsIgnoreCase("sound")) {
             if (args.length != 3) {
                 Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings sound <sound>");
+                Utils.sendMessage(sender, "&cDefault sound: &7" + plugin.getConfig().getString("mentionedSound"));
+                return;
+            }
+
+            try {
+                Sound.valueOf(args[2].toUpperCase());
+            } catch (IllegalArgumentException e) {
+                Utils.sendMessage(sender, "&cInvalid sound. /mentionchat settings sound <sound>");
                 Utils.sendMessage(sender, "&cDefault sound: &7" + plugin.getConfig().getString("mentionedSound"));
                 return;
             }

@@ -2,6 +2,7 @@ package me.jovannmc.mentionchat;
 
 import me.jovannmc.mentionchat.commands.MentionChatCommand;
 import me.jovannmc.mentionchat.handlers.MentionHandler;
+import me.jovannmc.mentionchat.tabcompleters.MentionChatCommandTabCompleter;
 import me.jovannmc.mentionchat.utils.UpdateChecker;
 import me.jovannmc.mentionchat.utils.Utils;
 import org.bstats.bukkit.Metrics;
@@ -31,6 +32,7 @@ public class MentionChat extends JavaPlugin implements Listener {
         configTasks();
 
         Bukkit.getPluginCommand("mentionchat").setExecutor(new MentionChatCommand());
+        Bukkit.getPluginCommand("mentionchat").setTabCompleter(new MentionChatCommandTabCompleter());
         Bukkit.getPluginManager().registerEvents(new MentionHandler(), this);
         new Metrics(this, 19327);
 
