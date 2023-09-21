@@ -14,6 +14,11 @@ permissions:
     children:
       mentionchat.command.info: true
       mentionchat.command.reload: true
+      mentionchat.command.help: true
+      mentionchat.command.settings: true
+      mentionchat.command.settings.toggle: true
+      mentionchat.command.settings.format: true
+      mentionchat.command.settings.sound: true
       mentionchat.mention.others: true
       mentionchat.mention.everyone: true
       mentionchat.mention.bypass: true
@@ -23,6 +28,21 @@ permissions:
   mentionchat.command.reload:
     description: Allows players to reload MentionChat's config.
     default: OP
+  mentionchat.command.help:
+    description: Allows players to view MentionChat's help page.
+    default: true
+  mentionchat.command.settings:
+    description: Allows players to modify their settings for MentionChat.
+    default: true
+  mentionchat.command.settings.toggle:
+    description: Allows players to toggle their mentions on and off.
+    default: true
+  mentionchat.command.settings.format:
+    description: Allows players to change their mention format.
+    default: true
+  mentionchat.command.settings.sound:
+    description: Allows players to change their mention sound.
+    default: true
   mentionchat.mention.others:
     description: Allows players to mention other players in chat.
     default: true
@@ -32,3 +52,6 @@ permissions:
   mentionchat.mention.bypass:
     description: Allows players to bypass the cooldown between mentions.
     default: OP
+  mentionchat.mention.exempt:
+    description: Allows players to be exempt from being mentioned.
+    default: false

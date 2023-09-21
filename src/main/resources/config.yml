@@ -34,6 +34,9 @@ mentionedSound: ENTITY_ARROW_HIT_PLAYER
 # To disable the cooldown, put 0.
 cooldown: 3
 
+# What should you see when you try to mention someone who has mentions disabled, or has the permission mentionchat.mention.exempt
+playerMentionDisabled: "&4%mention% has mentions disabled!"
+
 # What should you see when you try to mention people during the cooldown?
 cooldownMessage: "&4Please don't try to spam mention people."
 
@@ -41,4 +44,4 @@ cooldownMessage: "&4Please don't try to spam mention people."
 noPermissionMessage: "&4You don't have permission to mention them!"
 
 # DO NOT TOUCH THIS
-configVersion: 2
+configVersion: 3

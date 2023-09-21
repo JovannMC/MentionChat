@@ -12,9 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.logging.Level;
 
 public class MentionChat extends JavaPlugin implements Listener {
@@ -60,7 +57,7 @@ public class MentionChat extends JavaPlugin implements Listener {
             firstRun = true;
         }
 
-        if (!dataFile.exists() && dataFile != null	) {
+        if (!dataFile.exists() && dataFile != null) {
             dataFile.getParentFile().mkdir();
             saveData();
         }
@@ -72,7 +69,7 @@ public class MentionChat extends JavaPlugin implements Listener {
         }
 
         // Check config version
-        if (getConfig().getInt("configVersion") != 2 && !firstRun) {
+        if (getConfig().getInt("configVersion") != 3 && !firstRun) {
             Bukkit.getLogger().log(Level.SEVERE,
                     "Your config.yml is outdated. Please regenerate the config.yml and reconfigure MentionChat.");
             Bukkit.getPluginManager().disablePlugin(this);
@@ -81,10 +78,6 @@ public class MentionChat extends JavaPlugin implements Listener {
 
     public FileConfiguration getData() {
         return data;
-    }
-
-    public File getDataFile() {
-        return dataFile;
     }
 
     public void saveData() {

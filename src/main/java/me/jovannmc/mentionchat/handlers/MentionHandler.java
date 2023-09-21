@@ -11,16 +11,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 public class MentionHandler implements Listener {
     private final HashMap<UUID, Long> nextMention = new HashMap<>();
     private Long nextMentionTime;
 
-    private MentionChat plugin = MentionChat.getPlugin(MentionChat.class);
+    private final MentionChat plugin = MentionChat.getPlugin(MentionChat.class);
 
     @EventHandler
     public void playerChatEvent(AsyncPlayerChatEvent e) {
@@ -56,15 +54,36 @@ public class MentionHandler implements Listener {
     }
 
     private void mentionUser(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned) {
+        // Check if player has mentions disabled
+        List<Player> playersToRemove = new ArrayList<>();
+        for (Player mentionedPlayer : mentioned) {
+            if (plugin.getData().contains(mentionedPlayer.getUniqueId().toString() + ".toggle") && !plugin.getData().getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle")) {
+                playersToRemove.add(mentionedPlayer);
+            } else if (mentionedPlayer.hasPermission("mentionchat.mention.exempt")) {
+                playersToRemove.add(mentionedPlayer);
+            }
+        }
+        if (!playersToRemove.isEmpty()) {
+            mentioned.removeAll(playersToRemove);
+            List<String> names = new ArrayList<>();
+            for (Player player : playersToRemove) {
+                names.add(player.getName());
+            }
+            Utils.sendMessage(mentioner, getConfig().getString("playerMentionDisabled").replace("%mention%", String.join(", ", names)));
+        }
+
+        // Check if player has permission to mention
+        if (!mentioner.hasPermission("mentionchat.mention.others")) {
+            Utils.sendMessage(mentioner, getConfig().getString("noPermissionMessage"));
+            return;
+        }
+
         // Cooldown logic
         if (nextMention.containsKey(mentioner.getUniqueId())) {
             if (!mentioner.hasPermission("mentionchat.mention.bypass")) {
                 nextMentionTime = getConfig().getLong("cooldown");
                 long secondsLeft = ((nextMention.get(mentioner.getUniqueId()) / 1000) + nextMentionTime) - (System.currentTimeMillis() / 1000);
-                if (secondsLeft > 0) {
-                    Utils.sendMessage(mentioner, getConfig().getString("cooldownMessage"));
-                    return;
-                }
+                if (secondsLeft > 0) { Utils.sendMessage(mentioner, getConfig().getString("cooldownMessage")); return; }
             }
         }
 

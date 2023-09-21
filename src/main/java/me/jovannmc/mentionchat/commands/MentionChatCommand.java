@@ -28,7 +28,7 @@ public class MentionChatCommand implements CommandExecutor {
         } else if (args[0].equalsIgnoreCase("settings")) {
             settingsSubcommand(sender, args);
         } else {
-            Utils.sendMessage(sender, " &cInvalid usage. /mentionchat <help/settings/info/reload>");
+            Utils.sendMessage(sender, "&cInvalid usage. /mentionchat <help/settings/info/reload>");
         }
 
         return false;
@@ -83,7 +83,7 @@ public class MentionChatCommand implements CommandExecutor {
         if (args[1].equalsIgnoreCase("format")) {
             if (args.length < 3) {
                 Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings format <format>");
-                sender.sendMessage(ChatColor.RED + "Default format: " + ChatColor.GRAY + plugin.getConfig().get("mentionFormat"));
+                sender.sendMessage(ChatColor.RED + "Default format: " + ChatColor.RESET + plugin.getConfig().get("mentionFormat"));
                 return;
             }
 
@@ -95,7 +95,7 @@ public class MentionChatCommand implements CommandExecutor {
             plugin.getData().set(player.getUniqueId().toString() + ".format", format);
             plugin.saveData();
 
-            Utils.sendMessage(sender, prefix + " &aSet your mention format to: " + format);
+            Utils.sendMessage(sender, prefix + " &aSet your mention format to: &r" + format.replace("%mention%", player.getName()));
             return;
         } else if (args[1].equalsIgnoreCase("sound")) {
             if (args.length != 3) {
