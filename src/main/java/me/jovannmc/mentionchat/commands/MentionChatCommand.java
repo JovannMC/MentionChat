@@ -63,18 +63,40 @@ public class MentionChatCommand implements CommandExecutor {
         TextComponent infoMessage = new TextComponent("");
         String lineSeparator = "\n";
         if (args.length == 1 || (args.length == 2 && args[1].equalsIgnoreCase("1"))) {
+            if (Utils.isLegacyVersion()) {
+                infoMessage.addExtra(new TextComponent(Utils.color("&8--------------&a&lMentionChat Help &7(1/2)&8--------------" + lineSeparator)));
+            } else {
+                infoMessage.addExtra(new TextComponent(Utils.color("&8----------------&a&lMentionChat Help &7(1/2)&8---------------" + lineSeparator)));
+            }
+
             infoMessage.addExtra(lineSeparator);
             infoMessage.addExtra(createClickableCommand("&6/mentionchat (info): &rView MentionChat's info and perform an update check" + lineSeparator, "/mentionchat info"));
             infoMessage.addExtra(createClickableCommand("&6/mentionchat help: &rView this help page" + lineSeparator, "/mentionchat help "));
             infoMessage.addExtra(createClickableCommand("&6/mentionchat reload: &rReload MentionChat's config" + lineSeparator, "/mentionchat reload"));
             infoMessage.addExtra(createClickableCommand("&6/mentionchat settings <toggle/format/sound>: &rChange your MentionChat settings" + lineSeparator, "/mentionchat settings "));
             infoMessage.addExtra(lineSeparator);
+
+            if (Utils.isLegacyVersion()) {
+                infoMessage.addExtra(new TextComponent(Utils.color("&8--------------------------------------------------")));
+            } else {
+                infoMessage.addExtra(new TextComponent(Utils.color("&8-----------------------------------------------------")));
+            }
         } else if (args.length == 2 && args[1].equalsIgnoreCase("2")) {
+            if (Utils.isLegacyVersion()) {
+                infoMessage.addExtra(new TextComponent(Utils.color("&8--------------&a&lMentionChat Help &7(2/2)&8--------------" + lineSeparator)));
+            } else {
+                infoMessage.addExtra(new TextComponent(Utils.color("&8----------------&a&lMentionChat Help &7(2/2)&8---------------" + lineSeparator)));
+            }
             infoMessage.addExtra(lineSeparator);
             infoMessage.addExtra(createClickableCommand("&6/mentionchat settings toggle: &rChange if you can be mentioned" + lineSeparator, "/mentionchat settings toggle"));
             infoMessage.addExtra(createClickableCommand("&6/mentionchat settings format <format>: &rChange your mention format" + lineSeparator, "/mentionchat settings format "));
             infoMessage.addExtra(createClickableCommand("&6/mentionchat settings sound <sound>: &rChange your mention sound" + lineSeparator, "/mentionchat settings sound "));
             infoMessage.addExtra(lineSeparator);
+            if (Utils.isLegacyVersion()) {
+                infoMessage.addExtra(new TextComponent(Utils.color("&8--------------------------------------------------")));
+            } else {
+                infoMessage.addExtra(new TextComponent(Utils.color("&8-----------------------------------------------------")));
+            }
         } else {
             Utils.sendMessage(sender, "&cInvalid usage. /mentionchat help (page)");
             return;
