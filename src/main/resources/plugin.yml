@@ -50,7 +50,7 @@ permissions:
     description: Allows players to mention everyone in chat.
     default: OP
   mentionchat.mention.bypass:
-    description: Allows players to bypass the cooldown between mentions and mention toggles.
+    description: Allows players to bypass the cooldown between mentions, mention toggles and exempt permission node.
     default: OP
   mentionchat.mention.bypass.cooldown:
     description: Allows players to bypass the cooldown between mentions.
