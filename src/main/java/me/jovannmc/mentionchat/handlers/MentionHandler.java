@@ -68,7 +68,7 @@ public class MentionHandler implements Listener {
             for (Player mentionedPlayer : mentioned) {
                 if (plugin.getData().contains(mentionedPlayer.getUniqueId().toString() + ".toggle") && !plugin.getData().getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle")) {
                     playersToRemove.add(mentionedPlayer);
-                } else if (mentionedPlayer.hasPermission("mentionchat.mention.exempt")) {
+                } else if (mentionedPlayer.hasPermission("mentionchat.mention.exempt") && !mentioner.hasPermission("mentionchat.mention.bypass.exempt")) {
                     playersToRemove.add(mentionedPlayer);
                 }
             }

@@ -58,6 +58,9 @@ permissions:
   mentionchat.mention.bypass.toggle:
     description: Allows players to bypass the mention toggle.
     default: OP
+  mentionchat.mention.bypass.exempt:
+    description: Allows players to bypass the mention exemption permission node.
+    default: OP
   mentionchat.mention.exempt:
     description: Allows players to be exempt from being mentioned, no matter their mention toggle.
     default: false
