@@ -5,7 +5,7 @@
 prefix: "&6[&eMentionChat&6]&r"
 
 # Should the plugin check for updates on startup?
-# You can always check for updates manually with /mentionchat.
+# You can always check for updates manually with /mentionchat (info).
 checkForUpdates: true
 
 # What should be placed at the beginning of the message to mention somebody?
@@ -13,11 +13,13 @@ checkForUpdates: true
 # Note: leaving it blank can cause any player with the permission mentionchat.mention.everyone to trigger an everyone mention unintentionally.
 mentionSymbol: "@"
 
-# What should the format for the message be?
+# What should the default format for the message be?
+# This can be overridden by players in game with /mentionchat settings format <format>
 # %mention% is the placeholder of the mentioned player or everyone.
 mentionFormat: "&6&l%mention%&r"
 
 # When you are mentioned, play this sound. No sound will be played when someone is mentioned and an error will appear if an invalid sound is chosen.
+# This can be overridden by players in game with /mentionchat settings sound <sound>
 # To disable the sound, put NONE.
 mentionedSound: ENTITY_ARROW_HIT_PLAYER
 
