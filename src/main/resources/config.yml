@@ -8,6 +8,10 @@ prefix: "&6[&eMentionChat&6]&r"
 # You can always check for updates manually with /mentionchat (info).
 checkForUpdates: true
 
+# How should the player be mentioned? Multiple can be used at once.
+# Possible values: FORMAT, CHAT, ACTIONBAR, BOSSBAR, TITLE
+mentionType: "FORMAT"
+
 # What should be placed at the beginning of the message to mention somebody?
 # To disable the mention symbol (and use just the player's name), leave it blank.
 # Note: leaving it blank can cause any player with the permission mentionchat.mention.everyone to trigger an everyone mention unintentionally.
@@ -24,7 +28,7 @@ mentionFormat: "&6&l%mention%&r"
 mentionedSound: ENTITY_ARROW_HIT_PLAYER
 
 # How much time (in seconds) should there be in between mentions?
-# Used to prevent mention spam.
+# Used to prevent mention spam and can be paired alongside other anti-spam plugins.
 # To disable the cooldown, put 0.
 cooldown: 3
 
