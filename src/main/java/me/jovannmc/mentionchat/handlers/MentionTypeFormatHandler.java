@@ -9,9 +9,9 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.HashSet;
 
-public class MentionTypeMessageHandler {
+public class MentionTypeFormatHandler {
 
-    public HashSet<Player> MentionTypeMessageHandler(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned, FileConfiguration config, MentionChat plugin) {
+    public MentionTypeFormatHandler(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned, FileConfiguration config, MentionChat plugin) {
         // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
         e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
 
@@ -48,8 +48,36 @@ public class MentionTypeMessageHandler {
                     sentMessages.add(player);
                 }
             }
+            plugin.playMentionSound(mentionedPlayer);
             mentionedPlayer.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
         }
-        return mentioned;
     }
+
+    public MentionTypeFormatHandler(AsyncPlayerChatEvent e, Player mentioner, FileConfiguration config, MentionChat plugin) {
+        // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
+        e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
+
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            String mentionSymbol = config.getString("mentionSymbol");
+            String mentionPattern = "(?i)" + mentionSymbol + "everyone\\b";
+            String mentionMessage = ChatColor.translateAlternateColorCodes('&', config.getString("mentionFormat").replace("%mention%", mentionSymbol + "everyone"));
+
+            // Like previously, we split the message into words so that it has to be @everyone, and also case-insensitive
+            String[] words = e.getMessage().split("\\s+");
+            StringBuilder newMessageBuilder = new StringBuilder();
+            for (String word : words) {
+                if (word.matches(mentionPattern)) {
+                    newMessageBuilder.append(" ").append(mentionMessage);
+                } else {
+                    newMessageBuilder.append(" ").append(word);
+                }
+            }
+            String newMessage = newMessageBuilder.toString().trim();
+            p.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
+
+            plugin.playMentionSound(p);
+        }
+    }
+
+
 }

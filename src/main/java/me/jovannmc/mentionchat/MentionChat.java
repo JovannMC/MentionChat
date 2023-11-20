@@ -7,8 +7,10 @@ import me.jovannmc.mentionchat.utils.UpdateChecker;
 import me.jovannmc.mentionchat.utils.Utils;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -87,6 +89,42 @@ public class MentionChat extends JavaPlugin implements Listener {
         if (getConfig().getInt("configVersion") != 3 && !firstRun) {
             Bukkit.getLogger().log(Level.SEVERE, "Your config.yml is outdated. Please regenerate the config.yml and reconfigure MentionChat.");
             Bukkit.getPluginManager().disablePlugin(this);
+        }
+    }
+
+    public void playMentionSound(Player mentioned) {
+        boolean customSound = false;
+        try {
+            String mentionedSound;
+
+            if (getData().contains(mentioned.getUniqueId().toString() + ".sound")) {
+                mentionedSound = getData().getString(mentioned.getUniqueId().toString() + ".sound");
+                customSound = true;
+            } else {
+                mentionedSound = getConfig().getString("mentionedSound");
+            }
+
+            Sound soundEnum;
+
+            if (Utils.isLegacyVersion() && mentionedSound.equalsIgnoreCase("ENTITY_ARROW_HIT_PLAYER")) {
+                // On legacy version and is using default sound which isn't supported
+                soundEnum = Sound.valueOf("SUCCESSFUL_HIT");
+            } else {
+                soundEnum = Sound.valueOf(mentionedSound);
+            }
+
+            if (mentionedSound != null && !mentionedSound.equalsIgnoreCase("NONE")) {
+                mentioned.playSound(mentioned.getLocation(), soundEnum, 1.0f, 1.0f);
+            }
+        } catch (Exception e) {
+            if (customSound) {
+                Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to play the sound (" + getData().getString(mentioned.getUniqueId().toString() + ".sound") + ") for the player " + mentioned.getName() + " with UUID " + mentioned.getUniqueId(), e);
+                Utils.sendMessage(mentioned, "&cAn error occurred while trying to play your custom sound (" + getData().getString(mentioned.getUniqueId().toString() + ".sound") + "). Please contact an administrator.");
+            } else {
+                Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to play the config sound (" + getConfig().getString("mentionedSound") + ").");
+                Bukkit.getLogger().log(Level.SEVERE, "The sound set in the config may be invalid.", e);
+                Utils.sendMessage(mentioned, "&cAn error occurred while trying to play the mention sound. (" + getConfig().getString("mentionedSound") + "). Please contact an administrator.");
+            }
         }
     }
 

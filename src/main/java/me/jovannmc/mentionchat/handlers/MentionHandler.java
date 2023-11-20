@@ -97,45 +97,22 @@ public class MentionHandler implements Listener {
             }
         }
 
-        // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
-        e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
-
-        // We use a HashSet here to track which players have already been sent a message, to prevent duplicate messages
-        HashSet<Player> sentMessages = new HashSet<>();
-
-        for (Player mentionedPlayer : mentioned) {
-            String mentionSymbol = getConfig().getString("mentionSymbol");
-            String mentionPattern = "(?i)" + mentionSymbol + mentionedPlayer.getName() + "\\b";
-            String mentionMessage;
-
-            if (plugin.getData().contains(mentionedPlayer.getUniqueId().toString() + ".format")) {
-                mentionMessage = ChatColor.translateAlternateColorCodes('&', plugin.getData().getString(mentionedPlayer.getUniqueId().toString() + ".format").replace("%mention%", mentionSymbol + mentionedPlayer.getName()));
-            } else {
-                mentionMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("mentionFormat").replace("%mention%", mentionSymbol + mentionedPlayer.getName()));
-            }
-
-            // Like previously, we split the message into words and check if any of them are a player's name to prevent duplicates
-            String[] words = e.getMessage().split("\\s+");
-            StringBuilder newMessageBuilder = new StringBuilder();
-            for (String word : words) {
-                if (word.matches(mentionPattern)) {
-                    newMessageBuilder.append(" ").append(mentionMessage);
-                } else {
-                    newMessageBuilder.append(" ").append(word);
-                }
-            }
-            String newMessage = newMessageBuilder.toString().trim();
-
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (!mentioned.contains(player) && !sentMessages.contains(player)) {
-                    // Add the player to the HashSet, so they don't get sent the same message multiple times
-                    player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
-                    sentMessages.add(player);
-                }
-            }
-            playMentionSound(mentionedPlayer);
-            mentionedPlayer.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
+        // Check mention type and handle mention accordingly
+        if (getConfig().getString("mentionType").contains("FORMAT")) {
+            new MentionTypeFormatHandler( e, mentioner, mentioned, getConfig(), plugin);
+        }/*
+        if (getConfig().getString("mentionType").contains("MESSAGE")) {
+            new MentionTypeMessageHandler(e, mentioner, mentioned, getConfig(), plugin);
         }
+        if (getConfig().getString("mentionType").contains("TITLE")) {
+            new MentionTypeTitleHandler(e, mentioner, mentioned, getConfig(), plugin);
+        }
+        if (getConfig().getString("mentionType").contains("BOSSBAR")) {
+            new MentionTypeBossbarHandler(e, mentioner, mentioned, getConfig(), plugin);
+        }
+        if (getConfig().getString("mentionType").contains("ACTIONBAR")) {
+            new MentionTypeActionbarHandler(e, mentioner, mentioned, getConfig(), plugin);
+        }*/
         nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
     }
 
@@ -152,67 +129,25 @@ public class MentionHandler implements Listener {
             }
         }
 
-        // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
-        e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
-
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            String mentionSymbol = getConfig().getString("mentionSymbol");
-            String mentionPattern = "(?i)" + mentionSymbol + "everyone\\b";
-            String mentionMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("mentionFormat").replace("%mention%", mentionSymbol + "everyone"));
-
-            // Like previously, we split the message into words so that it has to be @everyone, and also case-insensitive
-            String[] words = e.getMessage().split("\\s+");
-            StringBuilder newMessageBuilder = new StringBuilder();
-            for (String word : words) {
-                if (word.matches(mentionPattern)) {
-                    newMessageBuilder.append(" ").append(mentionMessage);
-                } else {
-                    newMessageBuilder.append(" ").append(word);
-                }
-            }
-            String newMessage = newMessageBuilder.toString().trim();
-            p.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
-
-            nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
-            playMentionSound(p);
+        // Check mention type and handle mention accordingly
+        if (getConfig().getString("mentionType").contains("FORMAT")) {
+            new MentionTypeFormatHandler(e, mentioner, getConfig(), plugin);
+        }/*
+        if (getConfig().getString("mentionType").contains("MESSAGE")) {
+            new MentionTypeMessageHandler(e, mentioner, mentioned, getConfig(), plugin);
         }
+        if (getConfig().getString("mentionType").contains("TITLE")) {
+            new MentionTypeTitleHandler(e, mentioner, mentioned, getConfig(), plugin);
+        }
+        if (getConfig().getString("mentionType").contains("BOSSBAR")) {
+            new MentionTypeBossbarHandler(e, mentioner, mentioned, getConfig(), plugin);
+        }
+        if (getConfig().getString("mentionType").contains("ACTIONBAR")) {
+            new MentionTypeActionbarHandler(e, mentioner, mentioned, getConfig(), plugin);
+        }*/
+        nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
     }
 
-    private void playMentionSound(Player mentioned) {
-        boolean customSound = false;
-        try {
-            String mentionedSound;
-
-            if (plugin.getData().contains(mentioned.getUniqueId().toString() + ".sound")) {
-                mentionedSound = plugin.getData().getString(mentioned.getUniqueId().toString() + ".sound");
-                customSound = true;
-            } else {
-                mentionedSound = getConfig().getString("mentionedSound");
-            }
-
-            Sound soundEnum;
-
-            if (Utils.isLegacyVersion() && mentionedSound.equalsIgnoreCase("ENTITY_ARROW_HIT_PLAYER")) {
-                // On legacy version and is using default sound which isn't supported
-                soundEnum = Sound.valueOf("SUCCESSFUL_HIT");
-            } else {
-                soundEnum = Sound.valueOf(mentionedSound);
-            }
-
-            if (mentionedSound != null && !mentionedSound.equalsIgnoreCase("NONE")) {
-                mentioned.playSound(mentioned.getLocation(), soundEnum, 1.0f, 1.0f);
-            }
-        } catch (Exception e) {
-            if (customSound) {
-                Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to play the sound (" + plugin.getData().getString(mentioned.getUniqueId().toString() + ".sound") + ") for the player " + mentioned.getName() + " with UUID " + mentioned.getUniqueId(), e);
-                Utils.sendMessage(mentioned, "&cAn error occurred while trying to play your custom sound (" + plugin.getData().getString(mentioned.getUniqueId().toString() + ".sound") + "). Please contact an administrator.");
-            } else {
-                Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to play the config sound (" + getConfig().getString("mentionedSound") + ").");
-                Bukkit.getLogger().log(Level.SEVERE, "The sound set in the config may be invalid.", e);
-                Utils.sendMessage(mentioned, "&cAn error occurred while trying to play the mention sound. (" + getConfig().getString("mentionedSound") + "). Please contact an administrator.");
-            }
-        }
-    }
 
     private FileConfiguration getConfig() {
         return plugin.getConfig();
