@@ -3,8 +3,6 @@ package me.jovannmc.mentionchat.handlers;
 import me.jovannmc.mentionchat.MentionChat;
 import me.jovannmc.mentionchat.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,7 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.*;
-import java.util.logging.Level;
 
 public class MentionHandler implements Listener {
     private final HashMap<UUID, Long> nextMention = new HashMap<>();
