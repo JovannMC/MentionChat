@@ -66,7 +66,7 @@ public class MentionHandler implements Listener {
         List<Player> playersToRemove = new ArrayList<>();
         if (!mentioner.hasPermission("mentionchat.mention.bypass") || !mentioner.hasPermission("mentionchat.mention.bypass.toggle")) {
             for (Player mentionedPlayer : mentioned) {
-                if (plugin.getData().contains(mentionedPlayer.getUniqueId().toString() + ".toggle") && !plugin.getData().getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle")) {
+                if (getData().contains(mentionedPlayer.getUniqueId().toString() + ".toggle") && !getData().getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle")) {
                     playersToRemove.add(mentionedPlayer);
                 } else if (mentionedPlayer.hasPermission("mentionchat.mention.exempt") && (!mentioner.hasPermission("mentionchat.mention.bypass.exempt") || !mentioner.hasPermission("mentionchat.mention.bypass"))) {
                     playersToRemove.add(mentionedPlayer);
@@ -108,8 +108,8 @@ public class MentionHandler implements Listener {
             String mentionPattern = "(?i)" + mentionSymbol + mentionedPlayer.getName() + "\\b";
             String mentionMessage;
 
-            if (plugin.getData().contains(mentionedPlayer.getUniqueId().toString() + ".format")) {
-                mentionMessage = ChatColor.translateAlternateColorCodes('&', plugin.getData().getString(mentionedPlayer.getUniqueId().toString() + ".format").replace("%mention%", mentionSymbol + mentionedPlayer.getName()));
+            if (getData().contains(mentionedPlayer.getUniqueId().toString() + ".format")) {
+                mentionMessage = ChatColor.translateAlternateColorCodes('&', getData().getString(mentionedPlayer.getUniqueId().toString() + ".format").replace("%mention%", mentionSymbol + mentionedPlayer.getName()));
             } else {
                 mentionMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("mentionFormat").replace("%mention%", mentionSymbol + mentionedPlayer.getName()));
             }
@@ -158,7 +158,13 @@ public class MentionHandler implements Listener {
         for (Player p : Bukkit.getOnlinePlayers()) {
             String mentionSymbol = getConfig().getString("mentionSymbol");
             String mentionPattern = "(?i)" + mentionSymbol + "everyone\\b";
-            String mentionMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("mentionFormat").replace("%mention%", mentionSymbol + "everyone"));
+            String mentionMessage;
+
+            if (getData().contains(p.getUniqueId().toString() + ".format")) {
+                mentionMessage = ChatColor.translateAlternateColorCodes('&', getData().getString(p.getUniqueId().toString() + ".format").replace("%mention%", mentionSymbol + "everyone"));
+            } else {
+                mentionMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("mentionFormat").replace("%mention%", mentionSymbol + "everyone"));
+            }
 
             // Like previously, we split the message into words so that it has to be @everyone, and also case-insensitive
             String[] words = e.getMessage().split("\\s+");
@@ -183,8 +189,8 @@ public class MentionHandler implements Listener {
         try {
             String mentionedSound;
 
-            if (plugin.getData().contains(mentioned.getUniqueId().toString() + ".sound")) {
-                mentionedSound = plugin.getData().getString(mentioned.getUniqueId().toString() + ".sound");
+            if (getData().contains(mentioned.getUniqueId().toString() + ".sound")) {
+                mentionedSound = getData().getString(mentioned.getUniqueId().toString() + ".sound");
                 customSound = true;
             } else {
                 mentionedSound = getConfig().getString("mentionedSound");
@@ -204,8 +210,8 @@ public class MentionHandler implements Listener {
             }
         } catch (Exception e) {
             if (customSound) {
-                Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to play the sound (" + plugin.getData().getString(mentioned.getUniqueId().toString() + ".sound") + ") for the player " + mentioned.getName() + " with UUID " + mentioned.getUniqueId(), e);
-                Utils.sendMessage(mentioned, "&cAn error occurred while trying to play your custom sound (" + plugin.getData().getString(mentioned.getUniqueId().toString() + ".sound") + "). Please contact an administrator.");
+                Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to play the sound (" + getData().getString(mentioned.getUniqueId().toString() + ".sound") + ") for the player " + mentioned.getName() + " with UUID " + mentioned.getUniqueId(), e);
+                Utils.sendMessage(mentioned, "&cAn error occurred while trying to play your custom sound (" + getData().getString(mentioned.getUniqueId().toString() + ".sound") + "). Please contact an administrator.");
             } else {
                 Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to play the config sound (" + getConfig().getString("mentionedSound") + ").");
                 Bukkit.getLogger().log(Level.SEVERE, "The sound set in the config may be invalid.", e);
@@ -216,5 +222,9 @@ public class MentionHandler implements Listener {
 
     private FileConfiguration getConfig() {
         return plugin.getConfig();
+    }
+
+    private FileConfiguration getData() {
+        return plugin.getData();
     }
 }
