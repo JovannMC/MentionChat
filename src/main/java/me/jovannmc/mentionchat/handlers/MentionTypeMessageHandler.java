@@ -1,6 +1,7 @@
 package me.jovannmc.mentionchat.handlers;
 
 import me.jovannmc.mentionchat.MentionChat;
+import me.jovannmc.mentionchat.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 
 public class MentionTypeMessageHandler {
 
+    // Mention everyone
     public HashSet<Player> MentionTypeMessageHandler(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned, FileConfiguration config, MentionChat plugin) {
         // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
         e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
@@ -19,36 +21,20 @@ public class MentionTypeMessageHandler {
         HashSet<Player> sentMessages = new HashSet<>();
 
         for (Player mentionedPlayer : mentioned) {
-            String mentionSymbol = config.getString("mentionSymbol");
-            String mentionPattern = "(?i)" + mentionSymbol + mentionedPlayer.getName() + "\\b";
-            String mentionMessage;
-
-            if (plugin.getData().contains(mentionedPlayer.getUniqueId().toString() + ".format")) {
-                mentionMessage = ChatColor.translateAlternateColorCodes('&', plugin.getData().getString(mentionedPlayer.getUniqueId().toString() + ".format").replace("%mention%", mentionSymbol + mentionedPlayer.getName()));
-            } else {
-                mentionMessage = ChatColor.translateAlternateColorCodes('&', config.getString("mentionFormat").replace("%mention%", mentionSymbol + mentionedPlayer.getName()));
-            }
-
-            // Like previously, we split the message into words and check if any of them are a player's name to prevent duplicates
-            String[] words = e.getMessage().split("\\s+");
-            StringBuilder newMessageBuilder = new StringBuilder();
-            for (String word : words) {
-                if (word.matches(mentionPattern)) {
-                    newMessageBuilder.append(" ").append(mentionMessage);
-                } else {
-                    newMessageBuilder.append(" ").append(word);
-                }
-            }
-            String newMessage = newMessageBuilder.toString().trim();
+            // Small bug here where with multiple mentions, the "mentionedMessage" may appear after the message instead of before.
+            // It's inconsistency caused by the loop but doesn't really need to be fixed.
+            Utils.sendMessage(mentionedPlayer, config.getString("mentionedMessage").replace("%player%", mentioner.getName()));
 
             for (Player player : Bukkit.getOnlinePlayers()) {
-                if (!mentioned.contains(player) && !sentMessages.contains(player)) {
+                if (!sentMessages.contains(player)) {
                     // Add the player to the HashSet, so they don't get sent the same message multiple times
                     player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
                     sentMessages.add(player);
                 }
             }
-            mentionedPlayer.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
+
+            Utils.sendMessage(mentionedPlayer, config.getString("mentionedMessage").replace("%player%", mentioner.getName()));
+            mentionedPlayer.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
         }
         return mentioned;
     }
