@@ -197,7 +197,7 @@ public class MentionChatCommand implements CommandExecutor {
             plugin.saveData();
         } else if (args[2].equalsIgnoreCase("message")) {
             if (args.length == 3) {
-                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings message <message>");
+                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings type message <message>");
                 sender.sendMessage(ChatColor.RED + "Default message: " + ChatColor.RESET + plugin.getConfig().get("mentionedMessage"));
                 return;
             }
@@ -206,7 +206,48 @@ public class MentionChatCommand implements CommandExecutor {
             Utils.sendMessage(sender, prefix + " &aSet your mention message to: &r" + message.replace("%player%", player.getName()));
             plugin.getData().set(player.getUniqueId().toString() + ".message", message);
             plugin.saveData();
-        } else {
+        }  else if (args[2].equalsIgnoreCase("title")) {
+            if (args.length == 3) {
+                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings type title <title/subtitle/actionbar>");
+                sender.sendMessage(ChatColor.RED + "Default title: " + ChatColor.RESET + plugin.getConfig().get("mentionedTitle"));
+                sender.sendMessage(ChatColor.RED + "Default subtitle: " + ChatColor.RESET + plugin.getConfig().get("mentionedSubtitle"));
+                sender.sendMessage(ChatColor.RED + "Default actionbar: " + ChatColor.RESET + plugin.getConfig().get("mentionedActionbar"));
+                return;
+            }
+
+            if (args[3].equalsIgnoreCase("title")) {
+                if (args.length == 4) {
+                    Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings type title title <title>");
+                    sender.sendMessage(ChatColor.RED + "Default title: " + ChatColor.RESET + plugin.getConfig().get("mentionedTitle"));
+                    return;
+                }
+
+                String title = Utils.buildString(args, 4);
+                Utils.sendMessage(sender, prefix + " &aSet your mention title to: &r" + title.replace("%player%", player.getName()));
+                plugin.getData().set(player.getUniqueId().toString() + ".title", title);
+                plugin.saveData();
+            } else if (args[3].equalsIgnoreCase("subtitle")) {
+                if (args.length == 4) {
+                    Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings type title subtitle <subtitle>");
+                    sender.sendMessage(ChatColor.RED + "Default subtitle: " + ChatColor.RESET + plugin.getConfig().get("mentionedSubtitle"));
+                    return;
+                }
+
+                String subtitle = Utils.buildString(args, 4);
+                Utils.sendMessage(sender, prefix + " &aSet your mention subtitle to: &r" + subtitle.replace("%player%", player.getName()));
+                plugin.getData().set(player.getUniqueId().toString() + ".subtitle", subtitle);
+                plugin.saveData();
+            } else if (args[3].equalsIgnoreCase("actionbar")) {
+                if (args.length == 4) {
+                    Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings type title actionbar <actionbar>");
+                    sender.sendMessage(ChatColor.RED + "Default actionbar: " + ChatColor.RESET + plugin.getConfig().get("mentionedActionbar"));
+                    return;
+                }
+
+                String actionbar = Utils.buildString(args, 4);
+                Utils.sendMessage(sender, prefix + " &aSet your mention actionbar to: &r" + actionbar.replace("%player%", player.getName()));
+
+        }else {
             Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings type <format/message/title/bossbar>");
         }
     }
