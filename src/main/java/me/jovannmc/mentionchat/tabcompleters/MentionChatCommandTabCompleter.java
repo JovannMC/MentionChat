@@ -23,7 +23,7 @@ public class MentionChatCommandTabCompleter implements TabCompleter {
             }
         } else if (args.length == 2 && args[0].equalsIgnoreCase("help")) {
             // /mentionchat help <1/2>
-            String[] helpPages = {"1", "2", "3", "4"};
+            String[] helpPages = {"1", "2", "3"};
             for (String page : helpPages) {
                 if (page.startsWith(args[1])) {
                     completions.add(page);

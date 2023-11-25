@@ -62,13 +62,14 @@ public class MentionChatCommand implements CommandExecutor {
         }
 
         TextComponent infoMessage = new TextComponent("");
-        TextComponent hoverText = new TextComponent("Click to enter the command");
-        String lineSeparator = "\n";
+        final TextComponent hoverText = new TextComponent("Click to enter the command");
+        final String lineSeparator = "\n";
+
         if (args.length == 1 || (args.length == 2 && args[1].equalsIgnoreCase("1"))) {
             if (Utils.isLegacyVersion()) {
-                infoMessage.addExtra(Utils.color("&8--------------&a&lMentionChat Help &7(1/4)&8--------------"));
+                infoMessage.addExtra(Utils.color("&8-----------&a&lMentionChat General &7(1/3)&8-------------"));
             } else {
-                infoMessage.addExtra(Utils.color("&8----------------&a&lMentionChat Help &7(1/4)&8---------------"));
+                infoMessage.addExtra(Utils.color("&8-------------&a&lMentionChat General &7(1/3)&8--------------"));
             }
 
             infoMessage.addExtra(lineSeparator + lineSeparator);
@@ -89,39 +90,17 @@ public class MentionChatCommand implements CommandExecutor {
         } else if (args.length == 2) {
             if (args[1].equalsIgnoreCase("2")) {
                 if (Utils.isLegacyVersion()) {
-                    infoMessage.addExtra(Utils.color("&8--------------&a&lMentionChat Help &7(2/4)&8--------------"));
+                    infoMessage.addExtra(Utils.color("&8----------&a&l/mentionchat settings &7(2/3)&8-------------"));
                 } else {
-                    infoMessage.addExtra(Utils.color("&8----------------&a&lMentionChat Help &7(2/4)&8---------------"));
+                    infoMessage.addExtra(Utils.color("&8-------------&a&l/mentionchat settings &7(2/3)&8-------------"));
                 }
 
                 infoMessage.addExtra(lineSeparator + lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings toggle: &rChange if you can be mentioned", "/mentionchat settings toggle", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..toggle: &rChange if you can be mentioned or not", "/mentionchat settings toggle", hoverText));
                 infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings type <format/message/title/bossbar>: &rModify settings for specific mention types", "/mentionchat type ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..type <format/message/title/bossbar>:&r Toggle and change settings for mention types", "/mentionchat settings type ", hoverText));
                 infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings sound {sound}: &rChange your mention sound", "/mentionchat settings sound ", hoverText));
-                infoMessage.addExtra(lineSeparator + lineSeparator);
-
-                if (Utils.isLegacyVersion()) {
-                    infoMessage.addExtra(new TextComponent(Utils.color("&8--------------------------------------------------")));
-                } else {
-                    infoMessage.addExtra(new TextComponent(Utils.color("&8-----------------------------------------------------")));
-                }
-            } else if (args[1].equalsIgnoreCase("3")) {
-                if (Utils.isLegacyVersion()) {
-                    infoMessage.addExtra(Utils.color("&8--------------&a&lMentionChat Help &7(3/4)&8--------------"));
-                } else {
-                    infoMessage.addExtra(Utils.color("&8----------------&a&lMentionChat Help &7(3/4)&8---------------"));
-                }
-
-                infoMessage.addExtra(lineSeparator + lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings type format {format}: &rChange if you can be mentioned", "/mentionchat settings type format ", hoverText));
-                infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings type message {message}: &rChange your mention format", "/mentionchat settings type message  ", hoverText));
-                infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings type title <title/subtitle/actionbar>: &rChange your mention message format", "/mentionchat settings type title ", hoverText));
-                infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings type bossbar <color/time>: &rChange your mention sound", "/mentionchat settings type bossbar ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..sound {sound}: &rChange your mention sound", "/mentionchat settings sound ", hoverText));
                 infoMessage.addExtra(lineSeparator + lineSeparator);
 
                 if (Utils.isLegacyVersion()) {
@@ -131,19 +110,19 @@ public class MentionChatCommand implements CommandExecutor {
                 }
             } else if (args[1].equalsIgnoreCase("3")) {
                 if (Utils.isLegacyVersion()) {
-                    infoMessage.addExtra(Utils.color("&8--------------&a&lMentionChat Help &7(4/4)&8--------------"));
+                    infoMessage.addExtra(Utils.color("&8-----------&a&l/mentionchat settings &7(3/3)&8------------"));
                 } else {
-                    infoMessage.addExtra(Utils.color("&8----------------&a&lMentionChat Help &7(4/4)&8---------------"));
+                    infoMessage.addExtra(Utils.color("&8-------------&a&l/mentionChat settings &7(3/3)&8-------------"));
                 }
 
                 infoMessage.addExtra(lineSeparator + lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings type title title {title}: &rChange if you can be mentioned", "/mentionchat settings type format ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..type format {format}: &rChange your mention format", "/mentionchat settings type format ", hoverText));
                 infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings type title subtitle {subtitle}: &rChange your mention format", "/mentionchat settings type message  ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..type message {message}: &rChange your mention message", "/mentionchat settings type message  ", hoverText));
                 infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings type title actionbar {actionbar}>: &rChange your mention message format", "/mentionchat settings type title ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..type title <title/subtitle/actionbar>: &rChange mention title settings", "/mentionchat settings type title ", hoverText));
                 infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings type bossbar <color/time>: &rChange your mention sound", "/mentionchat settings type bossbar ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..type bossbar <color/time>: &rChange your mention bossbar settings", "/mentionchat settings type bossbar ", hoverText));
                 infoMessage.addExtra(lineSeparator + lineSeparator);
 
                 if (Utils.isLegacyVersion()) {
@@ -151,6 +130,9 @@ public class MentionChatCommand implements CommandExecutor {
                 } else {
                     infoMessage.addExtra(new TextComponent(Utils.color("&8-----------------------------------------------------")));
                 }
+            } else {
+                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat help (page)");
+                return;
             }
         } else {
             Utils.sendMessage(sender, "&cInvalid usage. /mentionchat help (page)");
@@ -168,7 +150,7 @@ public class MentionChatCommand implements CommandExecutor {
     private void settingsSubcommand(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) { Utils.sendMessage(sender, "&cYou must be a player to use that command."); return; }
         if (!sender.hasPermission("mentionchat.command.settings")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return; }
-        if (args.length == 1) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings <toggle/format/sound>"); return; }
+        if (args.length == 1) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings <toggle/type/sound>"); return; }
         Player player = (Player) sender;
         String prefix = plugin.getConfig().getString("prefix");
 
@@ -182,28 +164,6 @@ public class MentionChatCommand implements CommandExecutor {
 
             plugin.saveData();
             Utils.sendMessage(sender, prefix + " &aToggled mentions " + (plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle") ? "on" : "off") + ".");
-            return;
-        }
-
-        if (args[1].equalsIgnoreCase("format")) {
-            if (args.length < 3) {
-                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings format <format>");
-                sender.sendMessage(ChatColor.RED + "Default format: " + ChatColor.RESET + plugin.getConfig().get("mentionFormat"));
-                return;
-            }
-
-            StringBuilder formatBuilder = new StringBuilder();
-            for (int i = 2; i < args.length; i++) {
-                formatBuilder.append(args[i]);
-                if (i < args.length - 1) {
-                    formatBuilder.append(" ");
-                }
-            }
-            String format = formatBuilder.toString();
-            plugin.getData().set(player.getUniqueId().toString() + ".format", format);
-            plugin.saveData();
-
-            Utils.sendMessage(sender, prefix + " &aSet your mention format to: &r" + format.replace("%mention%", player.getName()));
             return;
         } else if (args[1].equalsIgnoreCase("sound")) {
             if (args.length != 3) {
@@ -225,9 +185,49 @@ public class MentionChatCommand implements CommandExecutor {
 
             Utils.sendMessage(sender, prefix + " &aSet your mention sound to: " + args[2]);
             return;
+        } else if (args[1].equalsIgnoreCase("type")) {
+            typeSettingsSubcommand(sender, args);
+            return;
         }
 
-        Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings <toggle/format/sound>");
+        Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings <toggle/type/sound>");
+    }
+
+    /*
+        Type settings subcommand (/mentionchat settings type)
+    */
+
+    private void typeSettingsSubcommand(CommandSender sender, String[] args) {
+        if (args.length == 2) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings type <format/message/title/bossbar>"); return; }
+        Player player = (Player) sender;
+        String prefix = plugin.getConfig().getString("prefix");
+
+        if (args.length == 3) {
+            if (args[2].equalsIgnoreCase("format")) {
+                if (args.length < 3) {
+                    Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings format <format>");
+                    sender.sendMessage(ChatColor.RED + "Default format: " + ChatColor.RESET + plugin.getConfig().get("mentionFormat"));
+                    return;
+                }
+
+                StringBuilder formatBuilder = new StringBuilder();
+                for (int i = 2; i < args.length; i++) {
+                    formatBuilder.append(args[i]);
+                    if (i < args.length - 1) {
+                        formatBuilder.append(" ");
+                    }
+                }
+                String format = formatBuilder.toString();
+                plugin.getData().set(player.getUniqueId().toString() + ".format", format);
+                plugin.saveData();
+
+                Utils.sendMessage(sender, prefix + " &aSet your mention format to: &r" + format.replace("%mention%", player.getName()));
+            } else if (args[2].equalsIgnoreCase("message")) {
+
+            } else {
+                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings type <format/message/title/bossbar>");
+            }
+        }
     }
 
     /*
