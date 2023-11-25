@@ -23,4 +23,15 @@ public class Utils {
         }
         return false;
     }
+
+    public static String buildString(String[] args, int start) {
+        StringBuilder formatBuilder = new StringBuilder();
+        for (int i = start; i < args.length; i++) {
+            formatBuilder.append(args[i]);
+            if (i < args.length - 1) {
+                formatBuilder.append(" ");
+            }
+        }
+        return formatBuilder.toString();
+    }
 }
