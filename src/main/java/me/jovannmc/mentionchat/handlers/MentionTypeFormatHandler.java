@@ -11,6 +11,7 @@ import java.util.HashSet;
 
 public class MentionTypeFormatHandler {
 
+    // Mention users
     public MentionTypeFormatHandler(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned, FileConfiguration config, MentionChat plugin) {
         // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
         e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
@@ -53,6 +54,7 @@ public class MentionTypeFormatHandler {
         }
     }
 
+    // Mention everyone
     public MentionTypeFormatHandler(AsyncPlayerChatEvent e, Player mentioner, FileConfiguration config, MentionChat plugin) {
         // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
         e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
@@ -60,7 +62,13 @@ public class MentionTypeFormatHandler {
         for (Player p : Bukkit.getOnlinePlayers()) {
             String mentionSymbol = config.getString("mentionSymbol");
             String mentionPattern = "(?i)" + mentionSymbol + "everyone\\b";
-            String mentionMessage = ChatColor.translateAlternateColorCodes('&', config.getString("mentionFormat").replace("%mention%", mentionSymbol + "everyone"));
+            String mentionMessage;
+
+            if (plugin.getData().contains(p.getUniqueId().toString() + ".format")) {
+                mentionMessage = ChatColor.translateAlternateColorCodes('&', plugin.getData().getString(p.getUniqueId().toString() + ".format").replace("%mention%", mentionSymbol + "everyone"));
+            } else {
+                mentionMessage = ChatColor.translateAlternateColorCodes('&', config.getString("mentionFormat").replace("%mention%", mentionSymbol + "everyone"));
+            }
 
             // Like previously, we split the message into words so that it has to be @everyone, and also case-insensitive
             String[] words = e.getMessage().split("\\s+");
