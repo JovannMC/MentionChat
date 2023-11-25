@@ -1,8 +1,9 @@
 # MentionChat config.yml
 # Thanks for downloading my plugin!
 
-# Prefix for MentionChat commands.
-prefix: "&6[&eMentionChat&6]&r"
+#
+#  General settings
+#
 
 # Should the plugin check for updates on startup?
 # You can always check for updates manually with /mentionchat (info).
@@ -17,6 +18,23 @@ mentionType: "FORMAT"
 # Note: leaving it blank can cause any player with the permission mentionchat.mention.everyone to trigger an everyone mention unintentionally.
 mentionSymbol: "@"
 
+# When you are mentioned, play this sound. No sound will be played when someone is mentioned and an error will appear if an invalid sound is chosen.
+# This can be overridden by players in game with /mentionchat settings sound <sound>
+# To disable the sound, put NONE.
+mentionedSound: ENTITY_ARROW_HIT_PLAYER
+
+# How long (in seconds) should the mentions be displayed for (if applicable)?
+mentionedDuration: 5
+
+# How much time (in seconds) should there be in between mentions?
+# Used to prevent mention spam and can be paired alongside other anti-spam plugins.
+# To disable the cooldown, put 0.
+cooldown: 3
+
+#
+#  MentionChat Formatting
+#
+
 # If you chose FORMAT, what should the default format for the message be?
 # This can be overridden by players in game with /mentionchat settings format <format>
 # %mention% is the placeholder of the mentioned player or everyone.
@@ -26,15 +44,26 @@ mentionFormat: "&6&l%mention%&r"
 # %player% is the placeholder of the player's name
 mentionedMessage: "&6You were mentioned by &e%player%"
 
-# When you are mentioned, play this sound. No sound will be played when someone is mentioned and an error will appear if an invalid sound is chosen.
-# This can be overridden by players in game with /mentionchat settings sound <sound>
-# To disable the sound, put NONE.
-mentionedSound: ENTITY_ARROW_HIT_PLAYER
+# If you chose TITLE, what should the title look like?
+# %player% is the placeholder of the player's name
+mentionedTitle: "&6You were mentioned!"
+mentionedSubtitle: "&6You were mentioned by &e%player%!"
 
-# How much time (in seconds) should there be in between mentions?
-# Used to prevent mention spam and can be paired alongside other anti-spam plugins.
-# To disable the cooldown, put 0.
-cooldown: 3
+# If you chose ACTIONBAR, what message should be sent?
+# %player% is the placeholder of the player's name
+mentionedActionbar: "&6You were mentioned by &e%player%"
+
+# If you chose BOSSBAR, what message should be sent?
+# %player% is the placeholder of the player's name
+mentionedBossbar: "You were mentioned by %player%"
+mentionedBossbarColor: "YELLOW"
+
+#
+#  MentionChat messages
+#
+
+# Prefix for MentionChat commands.
+prefix: "&6[&eMentionChat&6]&r"
 
 # What should you see when you try to mention someone who has mentions disabled, or has the permission mentionchat.mention.exempt
 # %mention% is the placeholder of the mentioned player(s).

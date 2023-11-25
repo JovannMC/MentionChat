@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MentionChatCommandTabCompleter implements TabCompleter {
+    // TODO: add tab completion for new subcommands /mentionchat settings ..
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String label, String[] args) {
         List<String> completions = new ArrayList<>();
@@ -23,7 +24,7 @@ public class MentionChatCommandTabCompleter implements TabCompleter {
             }
         } else if (args.length == 2 && args[0].equalsIgnoreCase("help")) {
             // /mentionchat help <1/2>
-            String[] helpPages = {"1", "2", "3"};
+            String[] helpPages = {"1", "2", "3", "4"};
             for (String page : helpPages) {
                 if (page.startsWith(args[1])) {
                     completions.add(page);

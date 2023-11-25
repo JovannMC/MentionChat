@@ -66,7 +66,7 @@ public class MentionChatCommand implements CommandExecutor {
         final String lineSeparator = "\n";
 
         if (args.length == 1 || (args.length == 2 && args[1].equalsIgnoreCase("1"))) {
-            String header = Utils.isLegacyVersion() ? "&8-----------&a&lMentionChat General &7(1/3)&8-------------" : "&8-------------&a&lMentionChat General &7(1/3)&8--------------";
+            String header = Utils.isLegacyVersion() ? "&8-----------&a&lMentionChat General &7(1/4)&8-------------" : "&8-------------&a&lMentionChat General &7(1/4)&8--------------";
             infoMessage.addExtra(Utils.color(header));
 
             infoMessage.addExtra(lineSeparator + lineSeparator);
@@ -83,31 +83,44 @@ public class MentionChatCommand implements CommandExecutor {
             infoMessage.addExtra(new TextComponent(Utils.color(footer)));
         } else if (args.length == 2) {
             if (args[1].equalsIgnoreCase("2")) {
-                String header = Utils.isLegacyVersion() ? "&8-----------&a&lMentionChat General &7(2/3)&8-------------" : "&8-------------&a&lMentionChat General &7(2/3)&8--------------";
+                String header = Utils.isLegacyVersion() ? "&8-----------&a&l/mentionchat settings &7(2/4)&8------------" : "&8-------------&a&l/mentionchat settings &7(2/4)&8-------------";
                 infoMessage.addExtra(Utils.color(header));
 
                 infoMessage.addExtra(lineSeparator + lineSeparator);
                 infoMessage.addExtra(createHoverableCommand("&6..toggle: &rChange if you can be mentioned or not", "/mentionchat settings toggle", hoverText));
                 infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6..type <format/message/title/bossbar>:&r Toggle and change settings for mention types", "/mentionchat settings type ", hoverText));
-                infoMessage.addExtra(lineSeparator);
                 infoMessage.addExtra(createHoverableCommand("&6..sound {sound}: &rChange your mention sound", "/mentionchat settings sound ", hoverText));
+                infoMessage.addExtra(lineSeparator);
+                infoMessage.addExtra(createHoverableCommand("&6..duration {duration}:&r Change the duration to display mentions (if applicable)", "/mentionchat settings duration  ", hoverText));
+                infoMessage.addExtra(lineSeparator);
+                infoMessage.addExtra(createHoverableCommand("&6..type <format/message/title/bossbar>:&r Toggle and change settings for mention types", "/mentionchat settings type ", hoverText));
                 infoMessage.addExtra(lineSeparator + lineSeparator);
 
                 String footer = Utils.isLegacyVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
                 infoMessage.addExtra(Utils.color(footer));
             } else if (args[1].equalsIgnoreCase("3")) {
-                String header = Utils.isLegacyVersion() ? "&8-----------&a&lMentionChat General &7(3/3)&8-------------" : "&8-------------&a&lMentionChat General &7(3/3)&8--------------";
+                String header = Utils.isLegacyVersion() ? "&8---------&a&l/mentionchat settings type &7(3/4)&8---------" : "&8-----------&a&l/mentionchat settings type &7(3/4)&8----------";
                 infoMessage.addExtra(Utils.color(header));
 
                 infoMessage.addExtra(lineSeparator + lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6..type format {format}: &rChange your mention format", "/mentionchat settings type format ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..format (format): &rToggles/change your mention format", "/mentionchat settings type format ", hoverText));
                 infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6..type message {message}: &rChange your mention message", "/mentionchat settings type message  ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..message (message): &rToggles/change your mention message", "/mentionchat settings type message  ", hoverText));
                 infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6..type title <title/subtitle/actionbar>: &rChange mention title settings", "/mentionchat settings type title ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..title (title/subtitle): &rToggles/change mention title settings", "/mentionchat settings type title ", hoverText));
                 infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6..type bossbar <color/time>: &rChange your mention bossbar settings", "/mentionchat settings type bossbar ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..bossbar (text/color): &rToggles/change your mention bossbar settings", "/mentionchat settings type bossbar ", hoverText));
+                infoMessage.addExtra(lineSeparator + lineSeparator);
+
+                String footer = Utils.isLegacyVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
+                infoMessage.addExtra(Utils.color(footer));
+            } else if (args[1].equalsIgnoreCase("4")) {
+                String header = Utils.isLegacyVersion() ? "&8---------&a&l/mentionchat settings type &7(4/4)&8---------" : "&8----------&a&l/mentionchat settings type &7(4/4)&8-----------";
+                infoMessage.addExtra(Utils.color(header));
+
+                infoMessage.addExtra(lineSeparator + lineSeparator);
+                infoMessage.addExtra(createHoverableCommand("&6..actionbar (actionbar): &rToggles/change your mention actionbar", "/mentionchat settings type actionbar  ", hoverText));
+                infoMessage.addExtra(lineSeparator);
                 infoMessage.addExtra(lineSeparator + lineSeparator);
 
                 String footer = Utils.isLegacyVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
