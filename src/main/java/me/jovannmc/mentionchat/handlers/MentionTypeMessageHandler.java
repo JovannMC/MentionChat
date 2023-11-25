@@ -61,16 +61,13 @@ public class MentionTypeMessageHandler {
         // It's inconsistency caused by the loop but doesn't really need to be fixed.
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!sentMessages.contains(player)) {
-                if (!player.equals(mentioner)) {
-                    // Add the player to the HashSet, so they don't get sent the same message multiple times
-                    sentMessages.add(player);
-                    Utils.sendMessage(player, config.getString("mentionedMessage").replace("%player%", mentioner.getName()));
-                    plugin.playMentionSound(player);
-                }
+                // Add the player to the HashSet, so they don't get sent the same message multiple times
+                sentMessages.add(player);
+                Utils.sendMessage(player, config.getString("mentionedMessage").replace("%player%", mentioner.getName()));
+                plugin.playMentionSound(player);
                 // Not a mentioned player, so send the normal message
                 player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
             }
-
         }
     }
 }
