@@ -180,7 +180,10 @@ public class MentionChatCommand implements CommandExecutor {
     */
 
     private void typeSettingsSubcommand(CommandSender sender, String[] args) {
-        if (args.length == 2) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings type <format/message/title/bossbar>"); return; }
+        if (args.length == 2) {
+            Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings type <format/message/title/bossbar>");
+            return;
+        }
         Player player = (Player) sender;
         String prefix = plugin.getConfig().getString("prefix");
 
@@ -206,7 +209,7 @@ public class MentionChatCommand implements CommandExecutor {
             Utils.sendMessage(sender, prefix + " &aSet your mention message to: &r" + message.replace("%player%", player.getName()));
             plugin.getData().set(player.getUniqueId().toString() + ".message", message);
             plugin.saveData();
-        }  else if (args[2].equalsIgnoreCase("title")) {
+        } else if (args[2].equalsIgnoreCase("title")) {
             if (args.length == 3) {
                 Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings type title <title/subtitle/actionbar>");
                 sender.sendMessage(ChatColor.RED + "Default title: " + ChatColor.RESET + plugin.getConfig().get("mentionedTitle"));
@@ -247,8 +250,9 @@ public class MentionChatCommand implements CommandExecutor {
                 String actionbar = Utils.buildString(args, 4);
                 Utils.sendMessage(sender, prefix + " &aSet your mention actionbar to: &r" + actionbar.replace("%player%", player.getName()));
 
-        }else {
-            Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings type <format/message/title/bossbar>");
+            } else {
+                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings type <format/message/title/bossbar>");
+            }
         }
     }
 
