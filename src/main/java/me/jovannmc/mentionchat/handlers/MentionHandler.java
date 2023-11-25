@@ -97,10 +97,10 @@ public class MentionHandler implements Listener {
         // Check mention type and handle mention accordingly
         if (getConfig().getString("mentionType").contains("FORMAT")) {
             new MentionTypeFormatHandler(e, mentioner, mentioned, plugin);
-        }/*
-        if (getConfig().getString("mentionType").contains("MESSAGE")) {
-            new MentionTypeMessageHandler(e, mentioner, mentioned, getConfig(), plugin);
         }
+        if (getConfig().getString("mentionType").contains("MESSAGE")) {
+            new MentionTypeMessageHandler(e, mentioner, mentioned, plugin);
+        }/*
         if (getConfig().getString("mentionType").contains("TITLE")) {
             new MentionTypeTitleHandler(e, mentioner, mentioned, getConfig(), plugin);
         }
@@ -129,10 +129,10 @@ public class MentionHandler implements Listener {
         // Check mention type and handle mention accordingly
         if (getConfig().getString("mentionType").contains("FORMAT")) {
             new MentionTypeFormatHandler(e, mentioner, plugin);
-        }/*
-        if (getConfig().getString("mentionType").contains("MESSAGE")) {
-            new MentionTypeMessageHandler(e, mentioner, mentioned, getConfig(), plugin);
         }
+        if (getConfig().getString("mentionType").contains("MESSAGE")) {
+            new MentionTypeMessageHandler(e, mentioner, plugin);
+        }/*
         if (getConfig().getString("mentionType").contains("TITLE")) {
             new MentionTypeTitleHandler(e, mentioner, mentioned, getConfig(), plugin);
         }

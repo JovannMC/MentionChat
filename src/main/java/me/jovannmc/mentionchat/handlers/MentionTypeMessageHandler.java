@@ -12,30 +12,65 @@ import java.util.HashSet;
 
 public class MentionTypeMessageHandler {
 
-    // Mention everyone
-    public HashSet<Player> MentionTypeMessageHandler(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned, FileConfiguration config, MentionChat plugin) {
+    // Mention Users
+    public MentionTypeMessageHandler(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
+        // TODO: make sure it respects player's format
+        FileConfiguration config = plugin.getConfig();
+        FileConfiguration data = plugin.getData();
+
         // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
         e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
 
         // We use a HashSet here to track which players have already been sent a message, to prevent duplicate messages
         HashSet<Player> sentMessages = new HashSet<>();
 
+        // Send the message to each mentioned player
         for (Player mentionedPlayer : mentioned) {
             // Small bug here where with multiple mentions, the "mentionedMessage" may appear after the message instead of before.
             // It's inconsistency caused by the loop but doesn't really need to be fixed.
-            Utils.sendMessage(mentionedPlayer, config.getString("mentionedMessage").replace("%player%", mentioner.getName()));
+            if (!sentMessages.contains(mentionedPlayer)) {
+                // Add the player to the HashSet, so they don't get sent the same message multiple times
+                plugin.playMentionSound(mentionedPlayer);
+                sentMessages.add(mentionedPlayer);
+                Utils.sendMessage(mentionedPlayer, config.getString("mentionedMessage").replace("%player%", mentioner.getName()));
+                mentionedPlayer.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+            }
+        }
 
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (!sentMessages.contains(player)) {
+        // Send normal message to everyone else
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!mentioned.contains(player)) {
+                player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+            }
+        }
+    }
+
+    // Mention everyone
+    public MentionTypeMessageHandler(AsyncPlayerChatEvent e, Player mentioner, MentionChat plugin) {
+        // TODO: make sure it respects player's format
+        FileConfiguration config = plugin.getConfig();
+        FileConfiguration data = plugin.getData();
+
+        // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
+        e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
+
+        // We use a HashSet here to track which players have already been sent a message, to prevent duplicate messages
+        HashSet<Player> sentMessages = new HashSet<>();
+
+        // Small bug here where with multiple mentions, the "mentionedMessage" may appear after the message instead of before.
+        // It's inconsistency caused by the loop but doesn't really need to be fixed.
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!sentMessages.contains(player)) {
+                if (!player.equals(mentioner)) {
                     // Add the player to the HashSet, so they don't get sent the same message multiple times
-                    player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
                     sentMessages.add(player);
+                    Utils.sendMessage(player, config.getString("mentionedMessage").replace("%player%", mentioner.getName()));
+                    plugin.playMentionSound(player);
                 }
+                // Not a mentioned player, so send the normal message
+                player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
             }
 
-            Utils.sendMessage(mentionedPlayer, config.getString("mentionedMessage").replace("%player%", mentioner.getName()));
-            mentionedPlayer.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
         }
-        return mentioned;
     }
 }

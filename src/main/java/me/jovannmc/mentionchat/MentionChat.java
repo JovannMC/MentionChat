@@ -86,7 +86,7 @@ public class MentionChat extends JavaPlugin implements Listener {
         }
 
         // Check config version
-        if (getConfig().getInt("configVersion") != 3 && !firstRun) {
+        if (getConfig().getInt("configVersion") != 4 && !firstRun) {
             Bukkit.getLogger().log(Level.SEVERE, "Your config.yml is outdated. Please regenerate the config.yml and reconfigure MentionChat.");
             Bukkit.getPluginManager().disablePlugin(this);
         }
