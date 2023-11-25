@@ -27,6 +27,8 @@ public class MentionChat extends JavaPlugin implements Listener {
         -JovannMC
      */
 
+    // TODO: add feature to click on a player's name (or message) in chat to mention them
+
     private final File configFile = new File(getDataFolder() + File.separator, "config.yml");
     private final File dataFile = new File(getDataFolder() + File.separator, "data.yml");
 

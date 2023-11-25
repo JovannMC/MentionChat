@@ -34,6 +34,12 @@ public class MentionTypeMessageHandler {
                 sentMessages.add(mentionedPlayer);
                 Utils.sendMessage(mentionedPlayer, config.getString("mentionedMessage").replace("%player%", mentioner.getName()));
                 mentionedPlayer.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+
+                if (data.contains(mentionedPlayer.getUniqueId().toString() + ".message")) {
+                    Utils.sendMessage(mentionedPlayer, data.getString(mentionedPlayer.getUniqueId().toString() + ".message"));
+                } else {
+                    Utils.sendMessage(mentionedPlayer, config.getString("mentionMessage"));
+                }
             }
         }
 
