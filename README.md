@@ -128,4 +128,6 @@ A simple and open source plugin that allows players to mention other players in 
 
 This project is licensed under the [MIT](https://opensource.org/license/mit/) License - see the [LICENSE.md](LICENSE.md) file for details.
 
+## bStats Metrics
+This plugin uses [bStats](https://bstats.org) for completely anonymous plugin metrics. Check out the plugin's page for it [here](https://bstats.org/plugin/bukkit/MentionChat/19327)
 ![bStats Metrics](https://bstats.org/signatures/bukkit/mentionchat.svg)
