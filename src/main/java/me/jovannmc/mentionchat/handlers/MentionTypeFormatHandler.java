@@ -12,7 +12,10 @@ import java.util.HashSet;
 public class MentionTypeFormatHandler {
 
     // Mention users
-    public MentionTypeFormatHandler(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned, FileConfiguration config, MentionChat plugin) {
+    public MentionTypeFormatHandler(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
+        FileConfiguration config = plugin.getConfig();
+        FileConfiguration data = plugin.getData();
+        
         // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
         e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
 
@@ -24,8 +27,8 @@ public class MentionTypeFormatHandler {
             String mentionPattern = "(?i)" + mentionSymbol + mentionedPlayer.getName() + "\\b";
             String mentionMessage;
 
-            if (plugin.getData().contains(mentionedPlayer.getUniqueId().toString() + ".format")) {
-                mentionMessage = ChatColor.translateAlternateColorCodes('&', plugin.getData().getString(mentionedPlayer.getUniqueId().toString() + ".format").replace("%mention%", mentionSymbol + mentionedPlayer.getName()));
+            if (data.contains(mentionedPlayer.getUniqueId().toString() + ".format")) {
+                mentionMessage = ChatColor.translateAlternateColorCodes('&', data.getString(mentionedPlayer.getUniqueId().toString() + ".format").replace("%mention%", mentionSymbol + mentionedPlayer.getName()));
             } else {
                 mentionMessage = ChatColor.translateAlternateColorCodes('&', config.getString("mentionFormat").replace("%mention%", mentionSymbol + mentionedPlayer.getName()));
             }
@@ -55,7 +58,10 @@ public class MentionTypeFormatHandler {
     }
 
     // Mention everyone
-    public MentionTypeFormatHandler(AsyncPlayerChatEvent e, Player mentioner, FileConfiguration config, MentionChat plugin) {
+    public MentionTypeFormatHandler(AsyncPlayerChatEvent e, Player mentioner, MentionChat plugin) {
+        FileConfiguration config = plugin.getConfig();
+        FileConfiguration data = plugin.getData();
+
         // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
         e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
 
@@ -64,8 +70,8 @@ public class MentionTypeFormatHandler {
             String mentionPattern = "(?i)" + mentionSymbol + "everyone\\b";
             String mentionMessage;
 
-            if (plugin.getData().contains(p.getUniqueId().toString() + ".format")) {
-                mentionMessage = ChatColor.translateAlternateColorCodes('&', plugin.getData().getString(p.getUniqueId().toString() + ".format").replace("%mention%", mentionSymbol + "everyone"));
+            if (data.contains(p.getUniqueId().toString() + ".format")) {
+                mentionMessage = ChatColor.translateAlternateColorCodes('&', data.getString(p.getUniqueId().toString() + ".format").replace("%mention%", mentionSymbol + "everyone"));
             } else {
                 mentionMessage = ChatColor.translateAlternateColorCodes('&', config.getString("mentionFormat").replace("%mention%", mentionSymbol + "everyone"));
             }
