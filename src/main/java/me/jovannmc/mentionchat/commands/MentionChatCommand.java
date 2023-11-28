@@ -72,7 +72,7 @@ public class MentionChatCommand implements CommandExecutor {
             infoMessage.addExtra(lineSeparator + lineSeparator);
             infoMessage.addExtra(createHoverableCommand("&6/mentionchat (info): &rView MentionChat's info and perform an update check", "/mentionchat info", hoverText));
             infoMessage.addExtra(lineSeparator);
-            infoMessage.addExtra(createHoverableCommand("&6/mentionchat help (1-3): &rView this help page", "/mentionchat help", hoverText));
+            infoMessage.addExtra(createHoverableCommand("&6/mentionchat help (1-4): &rView this help page", "/mentionchat help", hoverText));
             infoMessage.addExtra(lineSeparator);
             infoMessage.addExtra(createHoverableCommand("&6/mentionchat reload: &rReload MentionChat's config", "/mentionchat reload", hoverText));
             infoMessage.addExtra(lineSeparator);
@@ -119,8 +119,7 @@ public class MentionChatCommand implements CommandExecutor {
                 infoMessage.addExtra(Utils.color(header));
 
                 infoMessage.addExtra(lineSeparator + lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6..actionbar (actionbar): &rToggles/change your mention actionbar", "/mentionchat settings type actionbar  ", hoverText));
-                infoMessage.addExtra(lineSeparator);
+                infoMessage.addExtra(createHoverableCommand("&6..actionbar (actionbar): &rToggles/change your mention actionbar", "/mentionchat settings type actionbar ", hoverText));
                 infoMessage.addExtra(lineSeparator + lineSeparator);
 
                 String footer = Utils.isLegacyVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
