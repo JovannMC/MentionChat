@@ -9,9 +9,10 @@
 # You can always check for updates manually with /mentionchat (info).
 checkForUpdates: true
 
-# How should the player be mentioned? Multiple can be used at once.
+# By default, how should the player be mentioned? Multiple can be used at once.
 # Possible values: FORMAT, MESSAGE, ACTIONBAR, BOSSBAR, TITLE
-mentionType: "FORMAT"
+# Example: [FORMAT, TITLE]
+mentionType: [FORMAT]
 
 # What should be placed at the beginning of the message to mention somebody?
 # To disable the mention symbol (and use just the player's name), leave it blank.

@@ -13,6 +13,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MentionChatCommand implements CommandExecutor {
@@ -87,13 +88,13 @@ public class MentionChatCommand implements CommandExecutor {
                 infoMessage.addExtra(Utils.color(header));
 
                 infoMessage.addExtra(lineSeparator + lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6..toggle: &rChange if you can be mentioned or not", "/mentionchat settings toggle", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..toggle (mentions/format/message/title/bossbar): &rChange if you can be mentioned or not", "/mentionchat settings toggle", hoverText));
                 infoMessage.addExtra(lineSeparator);
                 infoMessage.addExtra(createHoverableCommand("&6..sound {sound}: &rChange your mention sound", "/mentionchat settings sound ", hoverText));
                 infoMessage.addExtra(lineSeparator);
                 infoMessage.addExtra(createHoverableCommand("&6..duration {duration}:&r Change the duration to display mentions (if applicable)", "/mentionchat settings duration  ", hoverText));
                 infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6..type <format/message/title/bossbar>:&r Toggle and change settings for mention types", "/mentionchat settings type ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..type <format/message/title/bossbar>:&r Change settings for different mention types", "/mentionchat settings type ", hoverText));
                 infoMessage.addExtra(lineSeparator + lineSeparator);
 
                 String footer = Utils.isLegacyVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
@@ -103,13 +104,13 @@ public class MentionChatCommand implements CommandExecutor {
                 infoMessage.addExtra(Utils.color(header));
 
                 infoMessage.addExtra(lineSeparator + lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6..format (format): &rToggles/change your mention format", "/mentionchat settings type format ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..format {format}: &rChange your mention format", "/mentionchat settings type format ", hoverText));
                 infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6..message (message): &rToggles/change your mention message", "/mentionchat settings type message  ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..message {message}: &rChange your mention message", "/mentionchat settings type message  ", hoverText));
                 infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6..title (title/subtitle): &rToggles/change mention title settings", "/mentionchat settings type title ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..title {title/subtitle}: &rChange mention title settings", "/mentionchat settings type title ", hoverText));
                 infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6..bossbar (text/color): &rToggles/change your mention bossbar settings", "/mentionchat settings type bossbar ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..bossbar (text/color): &rChange your mention bossbar settings", "/mentionchat settings type bossbar ", hoverText));
                 infoMessage.addExtra(lineSeparator + lineSeparator);
 
                 String footer = Utils.isLegacyVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
@@ -119,7 +120,7 @@ public class MentionChatCommand implements CommandExecutor {
                 infoMessage.addExtra(Utils.color(header));
 
                 infoMessage.addExtra(lineSeparator + lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6..actionbar (actionbar): &rToggles/change your mention actionbar", "/mentionchat settings type actionbar ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..actionbar (actionbar): &rChange your mention actionbar", "/mentionchat settings type actionbar ", hoverText));
                 infoMessage.addExtra(lineSeparator + lineSeparator);
 
                 String footer = Utils.isLegacyVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
@@ -146,19 +147,41 @@ public class MentionChatCommand implements CommandExecutor {
         if (!sender.hasPermission("mentionchat.command.settings")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return; }
         if (args.length == 1) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings <toggle/type/sound>"); return; }
         Player player = (Player) sender;
+        String uuid = player.getUniqueId().toString();
         String prefix = plugin.getConfig().getString("prefix");
 
-        if ((args.length == 2) && (args[1].equalsIgnoreCase("toggle"))) {
-            if (plugin.getData().contains(player.getUniqueId().toString() + ".toggle")) {
-                plugin.getData().set(player.getUniqueId().toString() + ".toggle", !plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle"));
-            } else {
-                // Player hasn't toggled mentions yet. By default mentions are on, so set it to false
-                plugin.getData().set(player.getUniqueId().toString() + ".toggle", false);
+        if (args[1].equalsIgnoreCase("toggle")) {
+            if (args.length != 3) {
+                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings toggle <mentions/format/message/title/bossbar>");
+                return;
             }
 
-            plugin.saveData();
-            Utils.sendMessage(sender, prefix + " &aToggled mentions " + (plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle") ? "on" : "off") + ".");
-            return;
+            // Instead of using a lot of if statements, we can just check if the argument is in the array and adjust accordingly
+            // haha more efficient!! (i think??)
+            // also "mentions" isn't in the array because it's always enabled by default (maybe could add a config option to change this)
+            String[] allowedToggles = {"format", "message", "title", "bossbar"};
+            for (String toggle : allowedToggles) {
+                if (args[2].equalsIgnoreCase(toggle)) {
+                    // if player has the toggle in data file, set to opposite
+                    if (plugin.getData().contains(uuid + ".toggle." + toggle)) {
+                        plugin.getData().set(uuid + ".toggle." + toggle, !plugin.getData().getBoolean(uuid + ".toggle." + toggle));
+                    } else {
+                        // if player doesn't have the toggle in data file, check if it's in the config.
+                        // if it's in config, it's enabled by default so set to false
+                        String mentionType = Arrays.toString(plugin.getConfig().getStringList("mentionType").toArray());
+                        if (mentionType.contains(toggle.toUpperCase())) {
+                            plugin.getData().set(uuid + ".toggle." + toggle, false);
+                        } else {
+                            plugin.getData().set(uuid + ".toggle." + toggle, true);
+                        }
+                    }
+                    plugin.saveData();
+                    String toggleValue = plugin.getData().getBoolean(uuid + ".toggle." + toggle) ? "on" : "off";
+                    Utils.sendMessage(sender, prefix + " &aToggled " + toggle + " " + toggleValue + ".");
+                    return;
+                }
+            }
+
         } else if (args[1].equalsIgnoreCase("sound")) {
             if (args.length != 3) {
                 Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings sound <sound>");
