@@ -30,7 +30,7 @@ public class MentionTypeFormatHandler {
             if (data.contains(mentionedPlayer.getUniqueId().toString() + ".format")) {
                 mentionMessage = ChatColor.translateAlternateColorCodes('&', data.getString(mentionedPlayer.getUniqueId().toString() + ".format").replace("%mention%", mentionSymbol + mentionedPlayer.getName()));
             } else {
-                mentionMessage = ChatColor.translateAlternateColorCodes('&', config.getString("mentionFormat").replace("%mention%", mentionSymbol + mentionedPlayer.getName()));
+                mentionMessage = ChatColor.translateAlternateColorCodes('&', config.getString("mentionedFormat").replace("%mention%", mentionSymbol + mentionedPlayer.getName()));
             }
 
             // Like previously, we split the message into words and check if any of them are a player's name to prevent duplicates
@@ -73,7 +73,7 @@ public class MentionTypeFormatHandler {
             if (data.contains(p.getUniqueId().toString() + ".format")) {
                 mentionMessage = ChatColor.translateAlternateColorCodes('&', data.getString(p.getUniqueId().toString() + ".format").replace("%mention%", mentionSymbol + "everyone"));
             } else {
-                mentionMessage = ChatColor.translateAlternateColorCodes('&', config.getString("mentionFormat").replace("%mention%", mentionSymbol + "everyone"));
+                mentionMessage = ChatColor.translateAlternateColorCodes('&', config.getString("mentionedFormat").replace("%mention%", mentionSymbol + "everyone"));
             }
 
             // Like previously, we split the message into words so that it has to be @everyone, and also case-insensitive

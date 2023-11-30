@@ -77,7 +77,7 @@ public class MentionChatCommand implements CommandExecutor {
             infoMessage.addExtra(lineSeparator);
             infoMessage.addExtra(createHoverableCommand("&6/mentionchat reload: &rReload MentionChat's config", "/mentionchat reload", hoverText));
             infoMessage.addExtra(lineSeparator);
-            infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings <toggle/type/sound>: &rChange your MentionChat settings", "/mentionchat settings ", hoverText));
+            infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings <toggle/type/sound/duration>: &rChange your MentionChat settings", "/mentionchat settings ", hoverText));
             infoMessage.addExtra(lineSeparator + lineSeparator);
 
             String footer = Utils.isLegacyVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
@@ -92,7 +92,7 @@ public class MentionChatCommand implements CommandExecutor {
                 infoMessage.addExtra(lineSeparator);
                 infoMessage.addExtra(createHoverableCommand("&6..sound {sound}: &rChange your mention sound", "/mentionchat settings sound ", hoverText));
                 infoMessage.addExtra(lineSeparator);
-                infoMessage.addExtra(createHoverableCommand("&6..duration {duration}:&r Change the duration to display mentions (if applicable)", "/mentionchat settings duration  ", hoverText));
+                infoMessage.addExtra(createHoverableCommand("&6..duration {duration}:&r Change the duration of display mentions", "/mentionchat settings duration  ", hoverText));
                 infoMessage.addExtra(lineSeparator);
                 infoMessage.addExtra(createHoverableCommand("&6..type <format/message/title/bossbar>:&r Change settings for different mention types", "/mentionchat settings type ", hoverText));
                 infoMessage.addExtra(lineSeparator + lineSeparator);
@@ -145,7 +145,7 @@ public class MentionChatCommand implements CommandExecutor {
     private void settingsSubcommand(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) { Utils.sendMessage(sender, "&cYou must be a player to use that command."); return; }
         if (!sender.hasPermission("mentionchat.command.settings")) { Utils.sendMessage(sender, "&cYou don't have permission to use that command."); return; }
-        if (args.length == 1) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings <toggle/type/sound>"); return; }
+        if (args.length == 1) { Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings <toggle/type/sound/duration>"); return; }
         Player player = (Player) sender;
         String uuid = player.getUniqueId().toString();
         String prefix = plugin.getConfig().getString("prefix");
@@ -202,12 +202,35 @@ public class MentionChatCommand implements CommandExecutor {
 
             Utils.sendMessage(sender, prefix + " &aSet your mention sound to: " + args[2]);
             return;
+        } else if (args[1].equalsIgnoreCase("duration")) {
+            if (args.length != 3) {
+                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings duration <duration>");
+                Utils.sendMessage(sender, "&cDefault duration: &7" + plugin.getConfig().getInt("mentionedDuration"));
+                return;
+            }
+
+            try {
+                Integer.parseInt(args[2]);
+            } catch (NumberFormatException e) {
+                Utils.sendMessage(sender, "&cInvalid duration. /mentionchat settings duration <duration>");
+                Utils.sendMessage(sender, "&cDefault duration: &7" + plugin.getConfig().getInt("mentionedDuration"));
+                return;
+            }
+
+            plugin.getData().set(player.getUniqueId().toString() + ".duration", Integer.parseInt(args[2]));
+            plugin.saveData();
+
+            Utils.sendMessage(sender, prefix + " &aSet your mention duration to: " + args[2]);
+            return;
         } else if (args[1].equalsIgnoreCase("type")) {
             typeSettingsSubcommand(sender, args);
             return;
+        } else {
+            Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings <toggle/type/sound/duration>");
+            return;
         }
 
-        Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings <toggle/type/sound>");
+        Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings <toggle/type/sound/duration>");
     }
 
     /*
@@ -225,7 +248,7 @@ public class MentionChatCommand implements CommandExecutor {
         if (args[2].equalsIgnoreCase("format")) {
             if (args.length == 3) {
                 Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings type format {format}");
-                sender.sendMessage(ChatColor.RED + "Default format: " + ChatColor.RESET + plugin.getConfig().get("mentionFormat"));
+                sender.sendMessage(ChatColor.RED + "Default format: " + ChatColor.RESET + plugin.getConfig().get("mentionedFormat"));
                 return;
             }
 

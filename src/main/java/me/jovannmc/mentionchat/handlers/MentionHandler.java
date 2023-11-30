@@ -88,7 +88,7 @@ public class MentionHandler implements Listener {
         // Cooldown logic
         if (nextMention.containsKey(mentioner.getUniqueId())) {
             if (!mentioner.hasPermission("mentionchat.mention.bypass") || !mentioner.hasPermission("mentionchat.mention.bypass.cooldown")) {
-                nextMentionTime = getConfig().getLong("cooldown");
+                nextMentionTime = getConfig().getLong("mentionCooldown");
                 long secondsLeft = ((nextMention.get(mentioner.getUniqueId()) / 1000) + nextMentionTime) - (System.currentTimeMillis() / 1000);
                 if (secondsLeft > 0) { Utils.sendMessage(mentioner, getConfig().getString("cooldownMessage")); return; }
             }
@@ -117,7 +117,7 @@ public class MentionHandler implements Listener {
         // Cooldown logic
         if (nextMention.containsKey(mentioner.getUniqueId())) {
             if (!mentioner.hasPermission("mentionchat.mention.bypass")) {
-                nextMentionTime = getConfig().getLong("cooldown");
+                nextMentionTime = getConfig().getLong("mentionCooldown");
                 long secondsLeft = ((nextMention.get(mentioner.getUniqueId()) / 1000) + nextMentionTime) - (System.currentTimeMillis() / 1000);
                 if (secondsLeft > 0) {
                     Utils.sendMessage(mentioner, getConfig().getString("cooldownMessage"));

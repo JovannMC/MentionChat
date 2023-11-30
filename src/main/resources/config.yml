@@ -30,16 +30,16 @@ mentionedDuration: 5
 # How much time (in seconds) should there be in between mentions?
 # Used to prevent mention spam and can be paired alongside other anti-spam plugins.
 # To disable the cooldown, put 0.
-cooldown: 3
+mentionCooldown: 3
 
 #
-#  MentionChat Formatting
+#  MentionChat formatting
 #
 
 # If you chose FORMAT, what should the default format for the message be?
 # This can be overridden by players in game with /mentionchat settings format <format>
 # %mention% is the placeholder of the mentioned player or everyone.
-mentionFormat: "&6&l%mention%&r"
+mentionedFormat: "&6&l%mention%&r"
 
 # If you chose MESSAGE, what message should be sent?
 # %player% is the placeholder of the player's name
