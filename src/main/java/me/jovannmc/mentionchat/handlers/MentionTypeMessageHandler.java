@@ -35,13 +35,16 @@ public class MentionTypeMessageHandler {
                 } else {
                     Utils.sendMessage(mentionedPlayer, config.getString("mentionedMessage").replace("%player%", mentioner.getName()));
                 }
-                mentionedPlayer.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+
+                if (plugin.getData().get(mentionedPlayer.getUniqueId().toString() + ".toggle.format") != null && !plugin.getData().getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle.format")) {
+                    mentionedPlayer.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+                }
             }
         }
 
         // Send normal message to everyone else
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (!mentioned.contains(player)) {
+            if (!mentioned.contains(player) && plugin.getData().get(player.getUniqueId().toString() + ".toggle.format") != null && !plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.format")) {
                 player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
             }
         }
@@ -70,7 +73,10 @@ public class MentionTypeMessageHandler {
                 } else {
                     Utils.sendMessage(player, config.getString("mentionedMessage").replace("%player%", mentioner.getName()));
                 }
-                player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+
+                if (plugin.getData().get(player.getUniqueId().toString() + ".toggle.format") != null && !plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.format")) {
+                    player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+                }
             }
         }
     }
