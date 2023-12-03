@@ -8,7 +8,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.HashSet;
+import java.util.logging.Level;
 
 public class MentionTypeTitleHandler {
 
@@ -42,7 +45,7 @@ public class MentionTypeTitleHandler {
         // send title
         for (Player mentionedPlayer : mentioned) {
             plugin.playMentionSound(mentionedPlayer);
-            Utils.sendTitle(mentionedPlayer, title, subtitle, duration);
+            sendTitle(mentionedPlayer, title, subtitle, duration);
         }
     }
 
@@ -76,7 +79,87 @@ public class MentionTypeTitleHandler {
         // send title
         for (Player player : Bukkit.getOnlinePlayers()) {
             plugin.playMentionSound(player);
-            Utils.sendTitle(player, title, subtitle, duration);
+            sendTitle(player, title, subtitle, duration);
+        }
+    }
+
+    public void sendTitle(Player player, String title, String subtitle, int stayTime) {
+        String[] legacyVersions = {"1_11", "1_10", "1_9", "v1_8", "v1_7", "v1_6"};
+        for (String legacyVersion : legacyVersions) {
+            if (Utils.getServerVersion().startsWith(legacyVersion)) {
+                sendTitleLegacy(player, title, subtitle, stayTime);
+                return;
+            }
+        }
+
+        player.sendTitle(Utils.color(title), Utils.color(subtitle), 10, stayTime, 20);
+    }
+
+    private void sendTitleLegacy(Player player, String title, String subtitle, int stayTime) {
+        try {
+            String nmsPackage = "net.minecraft.server." + Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+            Class<?> mainTitlePacket = Class.forName(nmsPackage + ".PacketPlayOutTitle");
+            Class<?> chatSerializer = Class.forName(nmsPackage + ".IChatBaseComponent").getDeclaredClasses()[0];
+
+            Object titleText = chatSerializer.getMethod("a", String.class).invoke(null, "{\"text\":\"" + title.replace("&", "§") + "\"}");
+            Object subtitleText = chatSerializer.getMethod("a", String.class).invoke(null, "{\"text\":\"" + subtitle.replace("&", "§") + "\"}");
+
+            Object titlePacket = mainTitlePacket
+                    .getConstructor(mainTitlePacket.getDeclaredClasses()[0], Class.forName(nmsPackage + ".IChatBaseComponent"), int.class, int.class, int.class)
+                    .newInstance(mainTitlePacket.getDeclaredClasses()[0].getField("TITLE").get(null), titleText, 0, stayTime, 0);
+
+            Object subtitlePacket = mainTitlePacket
+                    .getConstructor(mainTitlePacket.getDeclaredClasses()[0], Class.forName(nmsPackage + ".IChatBaseComponent"), int.class, int.class, int.class)
+                    .newInstance(mainTitlePacket.getDeclaredClasses()[0].getField("SUBTITLE").get(null), subtitleText, 0, stayTime, 0);
+
+            sendPacket(player, titlePacket, stayTime);
+            sendPacket(player, subtitlePacket, stayTime);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // i dont know how any of this works help
+    private void sendPacket(Player player, Object packet, int stayTime) {
+        int stayTimeSeconds = stayTime * 20;
+        try {
+            Class<?> craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3] + ".entity.CraftPlayer");
+            Object craftPlayer = craftPlayerClass.cast(player);
+            Object handle = craftPlayerClass.getMethod("getHandle").invoke(craftPlayer);
+            Object playerConnection = handle.getClass().getField("playerConnection").get(handle);
+
+            if (stayTimeSeconds > 0) {
+                Class<?> packetClass = packet.getClass();
+                Class<?> enumTitleActionClass = Class.forName("net.minecraft.server." + Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3] + ".PacketPlayOutTitle$EnumTitleAction");
+
+                // Get the enum values directly
+                Object[] enumValues = enumTitleActionClass.getEnumConstants();
+
+                // Find the EnumTitleAction with the name "TIMES"
+                Object enumTitleAction = null;
+                for (Object enumValue : enumValues) {
+                    if (enumValue.toString().equals("TIMES")) {
+                        enumTitleAction = enumValue;
+                        break;
+                    }
+                }
+
+                // If EnumTitleAction is found, proceed
+                if (enumTitleAction != null) {
+                    Constructor<?> packetTimesConstructor = packetClass.getConstructor(int.class, int.class, int.class);
+                    Object packetTimes = packetTimesConstructor.newInstance(10, stayTimeSeconds, 20);
+
+                    Field actionField = packetClass.getDeclaredField("a");
+                    actionField.setAccessible(true);
+                    actionField.set(packetTimes, enumTitleAction);
+
+                    sendPacket(player, packetTimes, 0);
+                }
+            }
+
+            playerConnection.getClass().getMethod("sendPacket", Class.forName("net.minecraft.server." + Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3] + ".Packet")).invoke(playerConnection, packet);
+        } catch (Exception e) {
+            Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to send a packet to the player " + player.getName() + " with UUID " + player.getUniqueId(), e);
         }
     }
 }

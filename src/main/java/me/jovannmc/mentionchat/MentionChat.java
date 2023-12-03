@@ -28,6 +28,7 @@ public class MentionChat extends JavaPlugin implements Listener {
      */
 
     // TODO: add feature to click on a player's name (or message) in chat to mention them
+    // TODO: add custom graphs to bStats (mentionType, graphs for if using default options or not?)
 
     private final File configFile = new File(getDataFolder() + File.separator, "config.yml");
     private final File dataFile = new File(getDataFolder() + File.separator, "data.yml");
