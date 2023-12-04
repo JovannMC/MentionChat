@@ -84,36 +84,29 @@ public class MentionTypeBossbarHandler {
 
     private void sendBossbar(MentionChat plugin, Player player, String message, String color, int duration) {
         if (Utils.isLegacyVersion()) {
+            // TODO: get bossbar to work on 1.8 with reflection help im actually dying from this bro
             Utils.sendMessage(player, "&cBossbars are not supported on this version.");
         } else {
             BossBar bossBar = Bukkit.createBossBar(message, BarColor.valueOf(color), BarStyle.SOLID);
             bossBar.addPlayer(player);
 
-            // Calculate the interval between updates (in seconds)
-            int interval = 1;
-
-            // Schedule a task to decrease the boss bar progress over time
             new BukkitRunnable() {
                 int remainingTime = duration;
 
                 @Override
                 public void run() {
-                    // Calculate the progress based on remaining time
                     double progress = (double) remainingTime / duration;
 
-                    // Set the boss bar progress
                     bossBar.setProgress(progress);
 
-                    // Decrease the remaining time
                     remainingTime--;
 
-                    // Check if the boss bar should be removed
                     if (remainingTime <= 0) {
                         bossBar.removeAll();
-                        cancel(); // Stop the task
+                        cancel();
                     }
                 }
-            }.runTaskTimer(plugin, 0, interval * 20); // Convert interval to ticks
+            }.runTaskTimer(plugin, 0,  20); // Convert interval to ticks
         }
     }
 }
