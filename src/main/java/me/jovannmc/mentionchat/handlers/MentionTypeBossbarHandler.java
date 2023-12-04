@@ -17,7 +17,7 @@ import java.util.HashSet;
 public class MentionTypeBossbarHandler {
 
     // Mention Users
-    public MentionTypeBossbarHandler(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
+    public MentionTypeBossbarHandler(Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 
@@ -50,7 +50,7 @@ public class MentionTypeBossbarHandler {
     }
 
     // Mention everyone
-    public MentionTypeBossbarHandler(AsyncPlayerChatEvent e, Player mentioner, MentionChat plugin) {
+    public MentionTypeBossbarHandler(Player mentioner, MentionChat plugin) {
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 
@@ -83,30 +83,27 @@ public class MentionTypeBossbarHandler {
     }
 
     private void sendBossbar(MentionChat plugin, Player player, String message, String color, int duration) {
-        if (Utils.isLegacyVersion()) {
-            // TODO: get bossbar to work on 1.8 with reflection help im actually dying from this bro
-            Utils.sendMessage(player, "&cBossbars are not supported on this version.");
-        } else {
-            BossBar bossBar = Bukkit.createBossBar(message, BarColor.valueOf(color), BarStyle.SOLID);
-            bossBar.addPlayer(player);
+        if (Utils.isLegacyVersion()) return;
 
-            new BukkitRunnable() {
-                int remainingTime = duration;
+        BossBar bossBar = Bukkit.createBossBar(Utils.color(message.replace("%player%", player.getName())), BarColor.valueOf(color), BarStyle.SEGMENTED_20);
+        bossBar.addPlayer(player);
 
-                @Override
-                public void run() {
-                    double progress = (double) remainingTime / duration;
+        new BukkitRunnable() {
+            int remainingTime = duration;
 
-                    bossBar.setProgress(progress);
+            @Override
+            public void run() {
+                double progress = (double) remainingTime / duration;
 
-                    remainingTime--;
+                bossBar.setProgress(progress);
 
-                    if (progress <= 0) {
-                        bossBar.removeAll();
-                        cancel();
-                    }
+                remainingTime--;
+
+                if (progress <= 0) {
+                    bossBar.removeAll();
+                    cancel();
                 }
-            }.runTaskTimer(plugin, 0,  20); // Convert interval to ticks
-        }
+            }
+        }.runTaskTimer(plugin, 0,  20); // Convert interval to ticks
     }
 }

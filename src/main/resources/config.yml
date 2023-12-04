@@ -56,8 +56,8 @@ mentionedActionbar: "&6You were mentioned by &e%player%"
 
 # If you chose BOSSBAR, what message should be sent?
 # %player% is the placeholder of the player's name
-mentionedBossbar: "You were mentioned by %player%"
-mentionedBossbarColor: "YELLOW"
+mentionedBossbar: "&6You were mentioned by &e%player%"
+mentionedBossbarColor: "PURPLE"
 
 #
 #  MentionChat messages

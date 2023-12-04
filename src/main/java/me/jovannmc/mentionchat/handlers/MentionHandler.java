@@ -104,13 +104,13 @@ public class MentionHandler implements Listener {
             new MentionTypeMessageHandler(e, mentioner, mentioned, plugin);
         }
         if (getConfig().getString("mentionType").contains("TITLE")) {
-            new MentionTypeTitleHandler(e, mentioner, mentioned, plugin);
+            new MentionTypeTitleHandler(mentioner, mentioned, plugin);
         }
         if (getConfig().getString("mentionType").contains("BOSSBAR")) {
-            new MentionTypeBossbarHandler(e, mentioner, mentioned, plugin);
+            new MentionTypeBossbarHandler(mentioner, mentioned, plugin);
         }
         if (getConfig().getString("mentionType").contains("ACTIONBAR")) {
-            new MentionTypeActionbarHandler(e, mentioner, mentioned, plugin);
+            new MentionTypeActionbarHandler(mentioner, mentioned, plugin);
         }
         nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
     }
@@ -136,13 +136,13 @@ public class MentionHandler implements Listener {
             new MentionTypeMessageHandler(e, mentioner, plugin);
         }
         if (getConfig().getString("mentionType").contains("TITLE")) {
-            new MentionTypeTitleHandler(e, mentioner, plugin);
+            new MentionTypeTitleHandler(mentioner, plugin);
         }
         if (getConfig().getString("mentionType").contains("BOSSBAR")) {
-            new MentionTypeBossbarHandler(e, mentioner, plugin);
+            new MentionTypeBossbarHandler(mentioner, plugin);
         }
         if (getConfig().getString("mentionType").contains("ACTIONBAR")) {
-            new MentionTypeActionbarHandler(e, mentioner, plugin);
+            new MentionTypeActionbarHandler(mentioner, plugin);
         }
         nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
     }

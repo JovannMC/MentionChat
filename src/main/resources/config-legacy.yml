@@ -10,7 +10,7 @@
 checkForUpdates: true
 
 # By default, how should the player be mentioned? Multiple can be used at once.
-# Possible values: FORMAT, MESSAGE, ACTIONBAR, BOSSBAR, TITLE
+# Possible values: FORMAT, MESSAGE, TITLE
 # Example: [FORMAT, TITLE]
 mentionType: [FORMAT]
 
@@ -49,15 +49,6 @@ mentionedMessage: "&6You were mentioned by &e%player%"
 # %player% is the placeholder of the player's name
 mentionedTitle: "&6You were mentioned!"
 mentionedSubtitle: "&6You were mentioned by &e%player%!"
-
-# If you chose ACTIONBAR, what message should be sent?
-# %player% is the placeholder of the player's name
-mentionedActionbar: "&6You were mentioned by &e%player%"
-
-# If you chose BOSSBAR, what message should be sent?
-# %player% is the placeholder of the player's name
-mentionedBossbar: "You were mentioned by %player%"
-mentionedBossbarColor: "YELLOW"
 
 #
 #  MentionChat messages

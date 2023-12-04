@@ -16,7 +16,7 @@ import java.util.logging.Level;
 public class MentionTypeTitleHandler {
 
     // Mention Users
-    public MentionTypeTitleHandler(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
+    public MentionTypeTitleHandler(Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 
@@ -50,7 +50,7 @@ public class MentionTypeTitleHandler {
     }
 
     // Mention everyone
-    public MentionTypeTitleHandler(AsyncPlayerChatEvent e, Player mentioner, MentionChat plugin) {
+    public MentionTypeTitleHandler(Player mentioner, MentionChat plugin) {
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 
@@ -95,6 +95,7 @@ public class MentionTypeTitleHandler {
         player.sendTitle(Utils.color(title), Utils.color(subtitle), 10, stayTime, 20);
     }
 
+    // For versions below 1.12
     private void sendTitleLegacy(Player player, String title, String subtitle, int stayTime) {
         try {
             String nmsPackage = "net.minecraft.server." + Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];

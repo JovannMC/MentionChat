@@ -52,7 +52,7 @@ public class MentionChatCommandTabCompleter implements TabCompleter {
                         completions.add(sound.name());
                     }
                 } else if (args[1].equalsIgnoreCase("type")) {
-                    // /mentionchat settings type <format/message/title/bossbar>
+                    // /mentionchat settings type <format/message/title/actionbar/bossbar>
                     String[] mentionTypes = {"format", "message", "title", "actionbar", "bossbar"};
                     for (String mentionType : mentionTypes) {
                         if (mentionType.startsWith(args[2])) {
@@ -65,7 +65,7 @@ public class MentionChatCommandTabCompleter implements TabCompleter {
 
         if (args.length == 4) {
             if (args[1].equalsIgnoreCase("type")) {
-                // /mentionchat settings type <format/message/title/bossbar> {args}
+                // /mentionchat settings type <format/message/title/actionbar/bossbar> {args}
                 if (args[2].equalsIgnoreCase("title")) {
                     String[] titleOptions = {"title", "subtitle"};
                     for (String titleOption : titleOptions) {
@@ -74,7 +74,7 @@ public class MentionChatCommandTabCompleter implements TabCompleter {
                         }
                     }
                 } else if (args[2].equalsIgnoreCase("bossbar")) {
-                    String[] bossbarOptions = {"color", "time"};
+                    String[] bossbarOptions = {"text", "color"};
                     for (String bossbarOption : bossbarOptions) {
                         if (bossbarOption.startsWith(args[3])) {
                             completions.add(bossbarOption);
