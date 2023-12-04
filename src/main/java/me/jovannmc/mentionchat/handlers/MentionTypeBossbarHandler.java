@@ -85,15 +85,15 @@ public class MentionTypeBossbarHandler {
     private void sendBossbar(MentionChat plugin, Player player, String message, String color, int duration) {
         if (Utils.isLegacyVersion()) return;
 
-        BossBar bossBar = Bukkit.createBossBar(Utils.color(message.replace("%player%", player.getName())), BarColor.valueOf(color), BarStyle.SEGMENTED_20);
+        BossBar bossBar = Bukkit.createBossBar(Utils.color(message.replace("%player%", player.getName())), BarColor.valueOf(color), BarStyle.SEGMENTED_10);
         bossBar.addPlayer(player);
 
         new BukkitRunnable() {
-            int remainingTime = duration;
+            int remainingTime = duration + 1;
 
             @Override
             public void run() {
-                double progress = (double) remainingTime / duration;
+                double progress = (double) remainingTime / (duration + 1);
 
                 bossBar.setProgress(progress);
 

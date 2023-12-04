@@ -92,7 +92,7 @@ public class MentionTypeTitleHandler {
             }
         }
 
-        player.sendTitle(Utils.color(title), Utils.color(subtitle), 10, stayTime, 20);
+        player.sendTitle(Utils.color(title), Utils.color(subtitle), 10, stayTime * 20, 20);
     }
 
     // For versions below 1.12
