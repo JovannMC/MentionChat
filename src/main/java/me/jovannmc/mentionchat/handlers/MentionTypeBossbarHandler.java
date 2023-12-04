@@ -101,7 +101,7 @@ public class MentionTypeBossbarHandler {
 
                     remainingTime--;
 
-                    if (remainingTime <= 0) {
+                    if (progress <= 0) {
                         bossBar.removeAll();
                         cancel();
                     }
