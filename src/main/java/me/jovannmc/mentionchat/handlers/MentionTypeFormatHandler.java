@@ -1,7 +1,6 @@
 package me.jovannmc.mentionchat.handlers;
 
 import me.jovannmc.mentionchat.MentionChat;
-import me.jovannmc.mentionchat.events.PlayerMentionEvent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -12,7 +11,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import java.util.Collection;
 import java.util.HashSet;
 
 public class MentionTypeFormatHandler {
@@ -73,10 +71,6 @@ public class MentionTypeFormatHandler {
             finalMessage.addExtra(quickMention);
             finalMessage.addExtra(" " + newMessage);
 
-            System.out.println("call event");
-            PlayerMentionEvent playerMentionEvent = new PlayerMentionEvent(mentioner, mentioned, "FORMAT");
-            Bukkit.getPluginManager().callEvent(playerMentionEvent);
-
             mentionedPlayer.spigot().sendMessage(finalMessage);
         }
     }
@@ -119,11 +113,6 @@ public class MentionTypeFormatHandler {
             TextComponent finalMessage = new TextComponent("");
             finalMessage.addExtra(quickMention);
             finalMessage.addExtra(" " + newMessage);
-
-            HashSet<Player> onlinePlayers = new HashSet<>(Bukkit.getOnlinePlayers());
-            PlayerMentionEvent playerMentionEvent = new PlayerMentionEvent(mentioner, onlinePlayers, "FORMAT");
-
-            Bukkit.getPluginManager().callEvent(playerMentionEvent);
 
             p.spigot().sendMessage(finalMessage);
 

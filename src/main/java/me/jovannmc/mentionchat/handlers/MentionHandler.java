@@ -1,6 +1,7 @@
 package me.jovannmc.mentionchat.handlers;
 
 import me.jovannmc.mentionchat.MentionChat;
+import me.jovannmc.mentionchat.events.PlayerMentionEvent;
 import me.jovannmc.mentionchat.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -99,18 +100,23 @@ public class MentionHandler implements Listener {
         // Check mention type and handle mention accordingly
         if (getConfig().getString("mentionType").contains("FORMAT")) {
             new MentionTypeFormatHandler(e, mentioner, mentioned, plugin);
+            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "FORMAT"));
         }
         if (getConfig().getString("mentionType").contains("MESSAGE")) {
             new MentionTypeMessageHandler(e, mentioner, mentioned, plugin);
+            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "MESSAGE"));
         }
         if (getConfig().getString("mentionType").contains("TITLE")) {
             new MentionTypeTitleHandler(mentioner, mentioned, plugin);
+            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "TITLE"));
         }
         if (getConfig().getString("mentionType").contains("BOSSBAR")) {
             new MentionTypeBossbarHandler(mentioner, mentioned, plugin);
+            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "BOSSBAR"));
         }
         if (getConfig().getString("mentionType").contains("ACTIONBAR")) {
             new MentionTypeActionbarHandler(mentioner, mentioned, plugin);
+            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "ACTIONBAR"));
         }
         nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
     }
@@ -128,21 +134,28 @@ public class MentionHandler implements Listener {
             }
         }
 
+        HashSet<Player> onlinePlayers = new HashSet<>(Bukkit.getOnlinePlayers());
+
         // Check mention type and handle mention accordingly
         if (getConfig().getString("mentionType").contains("FORMAT")) {
             new MentionTypeFormatHandler(e, mentioner, plugin);
+            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "FORMAT"));
         }
         if (getConfig().getString("mentionType").contains("MESSAGE")) {
             new MentionTypeMessageHandler(e, mentioner, plugin);
+            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "MESSAGE"));
         }
         if (getConfig().getString("mentionType").contains("TITLE")) {
             new MentionTypeTitleHandler(mentioner, plugin);
+            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "TITLE"));
         }
         if (getConfig().getString("mentionType").contains("BOSSBAR")) {
             new MentionTypeBossbarHandler(mentioner, plugin);
+            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "BOSSBAR"));
         }
         if (getConfig().getString("mentionType").contains("ACTIONBAR")) {
             new MentionTypeActionbarHandler(mentioner, plugin);
+            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "ACTIONBAR"));
         }
         nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
     }
