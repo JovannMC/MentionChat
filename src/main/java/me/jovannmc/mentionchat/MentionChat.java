@@ -2,6 +2,7 @@ package me.jovannmc.mentionchat;
 
 import me.jovannmc.mentionchat.commands.MentionChatCommand;
 import me.jovannmc.mentionchat.handlers.MentionHandler;
+import me.jovannmc.mentionchat.handlers.QuickMentionHandler;
 import me.jovannmc.mentionchat.tabcompleters.MentionChatCommandTabCompleter;
 import me.jovannmc.mentionchat.utils.UpdateChecker;
 import me.jovannmc.mentionchat.utils.Utils;
@@ -30,7 +31,7 @@ public class MentionChat extends JavaPlugin implements Listener {
     // TODO: IMPORTANT! make the plugin work with other plugins that mess with chat formatting, plugin currently overrides it with default minecraft formatting
     // TODO: add feature to click on a player's name (or message) in chat to mention them
     // TODO: add custom graphs to bStats (mentionType, graphs for if using default options or not?)
-    // TODO: add warning message for using old server versions
+    // TODO: add warning message for using old server versions (test acitonbar, bossbar on 1.9-1.12)
 
     private final File configFile = new File(getDataFolder() + File.separator, "config.yml");
     private final File dataFile = new File(getDataFolder() + File.separator, "data.yml");
@@ -43,6 +44,7 @@ public class MentionChat extends JavaPlugin implements Listener {
         Bukkit.getPluginCommand("mentionchat").setExecutor(new MentionChatCommand());
         Bukkit.getPluginCommand("mentionchat").setTabCompleter(new MentionChatCommandTabCompleter());
         Bukkit.getPluginManager().registerEvents(new MentionHandler(), this);
+        Bukkit.getPluginManager().registerEvents(new QuickMentionHandler(), this);
         new Metrics(this, 19327);
 
         Bukkit.getLogger().log(Level.INFO, "MentionChat v" + getDescription().getVersion() + " has been enabled! Server version: " + Utils.getServerVersion());

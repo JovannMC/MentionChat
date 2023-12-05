@@ -1,12 +1,18 @@
 package me.jovannmc.mentionchat.handlers;
 
 import me.jovannmc.mentionchat.MentionChat;
+import me.jovannmc.mentionchat.events.PlayerMentionEvent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import java.util.Collection;
 import java.util.HashSet;
 
 public class MentionTypeFormatHandler {
@@ -15,7 +21,7 @@ public class MentionTypeFormatHandler {
     public MentionTypeFormatHandler(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
-        
+
         // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
         e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
 
@@ -45,15 +51,33 @@ public class MentionTypeFormatHandler {
             }
             String newMessage = newMessageBuilder.toString().trim();
 
+            TextComponent quickMention = new TextComponent("<" + e.getPlayer().getDisplayName() + ">");
+            quickMention.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Mention " + e.getPlayer().getName()).create()));
+            quickMention.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, mentionSymbol + e.getPlayer().getName()));
+
+            TextComponent finalMessage = new TextComponent("");
+            finalMessage.addExtra(quickMention);
+
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!mentioned.contains(player) && !sentMessages.contains(player)) {
-                    // Add the player to the HashSet, so they don't get sent the same message multiple times
-                    player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+                    TextComponent clonedMessage = new TextComponent(finalMessage);
+                    clonedMessage.addExtra(" " + e.getMessage());
+                    player.spigot().sendMessage(clonedMessage);
                     sentMessages.add(player);
                 }
             }
+
             plugin.playMentionSound(mentionedPlayer);
-            mentionedPlayer.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
+
+            finalMessage = new TextComponent("");
+            finalMessage.addExtra(quickMention);
+            finalMessage.addExtra(" " + newMessage);
+
+            System.out.println("call event");
+            PlayerMentionEvent playerMentionEvent = new PlayerMentionEvent(mentioner, mentioned, "FORMAT");
+            Bukkit.getPluginManager().callEvent(playerMentionEvent);
+
+            mentionedPlayer.spigot().sendMessage(finalMessage);
         }
     }
 
@@ -87,7 +111,21 @@ public class MentionTypeFormatHandler {
                 }
             }
             String newMessage = newMessageBuilder.toString().trim();
-            p.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", newMessage));
+
+            TextComponent quickMention = new TextComponent("<" + e.getPlayer().getDisplayName() + ">");
+            quickMention.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Mention " + e.getPlayer().getName()).create()));
+            quickMention.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, mentionSymbol + e.getPlayer().getName()));
+
+            TextComponent finalMessage = new TextComponent("");
+            finalMessage.addExtra(quickMention);
+            finalMessage.addExtra(" " + newMessage);
+
+            HashSet<Player> onlinePlayers = new HashSet<>(Bukkit.getOnlinePlayers());
+            PlayerMentionEvent playerMentionEvent = new PlayerMentionEvent(mentioner, onlinePlayers, "FORMAT");
+
+            Bukkit.getPluginManager().callEvent(playerMentionEvent);
+
+            p.spigot().sendMessage(finalMessage);
 
             plugin.playMentionSound(p);
         }
