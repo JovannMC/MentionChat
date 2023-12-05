@@ -48,6 +48,7 @@ public class MentionChatCommandTabCompleter implements TabCompleter {
             if (args[0].equalsIgnoreCase("settings")) {
                 if (args[1].equalsIgnoreCase("sound")) {
                     // /mentionchat settings sound <sound>
+                    completions.add("NONE");
                     for (Sound sound : Sound.values()) {
                         completions.add(sound.name());
                     }

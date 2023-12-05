@@ -189,12 +189,14 @@ public class MentionChatCommand implements CommandExecutor {
                 return;
             }
 
-            try {
-                Sound.valueOf(args[2].toUpperCase());
-            } catch (IllegalArgumentException e) {
-                Utils.sendMessage(sender, "&cInvalid sound. /mentionchat settings sound <sound>");
-                Utils.sendMessage(sender, "&cDefault sound: &7" + plugin.getConfig().getString("mentionedSound"));
-                return;
+            if (!args[2].equalsIgnoreCase("NONE")) {
+                try {
+                    Sound.valueOf(args[2].toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    Utils.sendMessage(sender, "&cInvalid sound. /mentionchat settings sound <sound>");
+                    Utils.sendMessage(sender, "&cDefault sound: &7" + plugin.getConfig().getString("mentionedSound"));
+                    return;
+                }
             }
 
             plugin.getData().set(player.getUniqueId().toString() + ".sound", args[2]);

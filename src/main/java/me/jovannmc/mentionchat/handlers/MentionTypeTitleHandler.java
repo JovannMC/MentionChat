@@ -10,6 +10,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.logging.Level;
 
@@ -115,8 +116,9 @@ public class MentionTypeTitleHandler {
 
             sendPacket(player, titlePacket, stayTime);
             sendPacket(player, subtitlePacket, stayTime);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException | NoSuchMethodException | NoSuchFieldException | IllegalAccessException |
+                 InvocationTargetException | InstantiationException e) {
+            Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to get the NMS classes for titles.", e);
         }
     }
 
@@ -133,10 +135,8 @@ public class MentionTypeTitleHandler {
                 Class<?> packetClass = packet.getClass();
                 Class<?> enumTitleActionClass = Class.forName("net.minecraft.server." + Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3] + ".PacketPlayOutTitle$EnumTitleAction");
 
-                // Get the enum values directly
                 Object[] enumValues = enumTitleActionClass.getEnumConstants();
 
-                // Find the EnumTitleAction with the name "TIMES"
                 Object enumTitleAction = null;
                 for (Object enumValue : enumValues) {
                     if (enumValue.toString().equals("TIMES")) {
@@ -145,7 +145,6 @@ public class MentionTypeTitleHandler {
                     }
                 }
 
-                // If EnumTitleAction is found, proceed
                 if (enumTitleAction != null) {
                     Constructor<?> packetTimesConstructor = packetClass.getConstructor(int.class, int.class, int.class);
                     Object packetTimes = packetTimesConstructor.newInstance(10, stayTimeSeconds, 20);

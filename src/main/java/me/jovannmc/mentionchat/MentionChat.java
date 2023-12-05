@@ -27,8 +27,10 @@ public class MentionChat extends JavaPlugin implements Listener {
         -JovannMC
      */
 
+    // TODO: IMPORTANT! make the plugin work with other plugins that mess with chat formatting, plugin currently overrides it with default minecraft formatting
     // TODO: add feature to click on a player's name (or message) in chat to mention them
     // TODO: add custom graphs to bStats (mentionType, graphs for if using default options or not?)
+    // TODO: add warning message for using old server versions
 
     private final File configFile = new File(getDataFolder() + File.separator, "config.yml");
     private final File dataFile = new File(getDataFolder() + File.separator, "data.yml");
@@ -74,7 +76,7 @@ public class MentionChat extends JavaPlugin implements Listener {
                         legacyConfigFile.delete();
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Bukkit.getLogger().log(Level.SEVERE, "An error occurred while trying to copy the config-legacy.yml file to config.yml", e);
                 }
             } else {
                 // Save config.yml
@@ -107,17 +109,8 @@ public class MentionChat extends JavaPlugin implements Listener {
                 mentionedSound = getConfig().getString("mentionedSound");
             }
 
-            Sound soundEnum;
-
-            if (Utils.isLegacyVersion() && mentionedSound.equalsIgnoreCase("ENTITY_ARROW_HIT_PLAYER")) {
-                // On legacy version and is using default sound which isn't supported
-                soundEnum = Sound.valueOf("SUCCESSFUL_HIT");
-            } else {
-                soundEnum = Sound.valueOf(mentionedSound);
-            }
-
             if (mentionedSound != null && !mentionedSound.equalsIgnoreCase("NONE")) {
-                mentioned.playSound(mentioned.getLocation(), soundEnum, 1.0f, 1.0f);
+                mentioned.playSound(mentioned.getLocation(), Sound.valueOf(mentionedSound), 1.0f, 1.0f);
             }
         } catch (Exception e) {
             if (customSound) {
