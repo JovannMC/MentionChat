@@ -3,7 +3,6 @@ package me.jovannmc.mentionchat.handlers;
 import me.jovannmc.mentionchat.MentionChat;
 import me.jovannmc.mentionchat.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
