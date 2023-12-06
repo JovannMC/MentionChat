@@ -196,17 +196,8 @@ public class MentionHandler implements Listener {
                 mentionedSound = getConfig().getString("mentionedSound");
             }
 
-            Sound soundEnum;
-
-            if (Utils.isLegacyVersion() && mentionedSound.equalsIgnoreCase("ENTITY_ARROW_HIT_PLAYER")) {
-                // On legacy version and is using default sound which isn't supported
-                soundEnum = Sound.valueOf("SUCCESSFUL_HIT");
-            } else {
-                soundEnum = Sound.valueOf(mentionedSound);
-            }
-
             if (mentionedSound != null && !mentionedSound.equalsIgnoreCase("NONE")) {
-                mentioned.playSound(mentioned.getLocation(), soundEnum, 1.0f, 1.0f);
+                mentioned.playSound(mentioned.getLocation(), Sound.valueOf(mentionedSound), 1.0f, 1.0f);
             }
         } catch (Exception e) {
             if (customSound) {
