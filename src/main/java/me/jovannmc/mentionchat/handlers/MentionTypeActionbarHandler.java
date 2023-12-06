@@ -55,7 +55,6 @@ public class MentionTypeActionbarHandler {
     private void sendActionbar(Player player, String message) {
         if (Utils.isLegacyVersion()) {
             // TODO: get actionbars to work on 1.8 with reflection help im actually dying from this bro
-            Utils.sendMessage(player, "&Actionbars are not supported on this version.");
         } else {
             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.color(message.replace("%player%", player.getName()))));
         }

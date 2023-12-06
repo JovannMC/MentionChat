@@ -29,7 +29,6 @@ public class MentionChat extends JavaPlugin implements Listener {
      */
 
     // TODO: IMPORTANT! make the plugin work with other plugins that mess with chat formatting, plugin currently overrides it with default minecraft formatting
-    // TODO: add feature to click on a player's name (or message) in chat to mention them
     // TODO: add custom graphs to bStats (mentionType, graphs for if using default options or not?)
     // TODO: add warning message for using old server versions (test acitonbar, bossbar on 1.9-1.12)
 
