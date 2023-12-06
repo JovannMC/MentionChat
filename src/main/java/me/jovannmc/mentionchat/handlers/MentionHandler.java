@@ -49,7 +49,7 @@ public class MentionHandler implements Listener {
                 return;
             } else if (word.startsWith(mentionSymbol)) {
                 String playerName = word.substring(mentionSymbol.length());
-                Player mentionedPlayer = Bukkit.getPlayer(playerName);
+                Player mentionedPlayer = Bukkit.getPlayerExact(playerName);
                 if (mentionedPlayer != null) {
                     mentionedPlayers.add(mentionedPlayer);
                 }
