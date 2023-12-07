@@ -16,7 +16,7 @@ import java.util.HashSet;
 public class MentionTypeFormatHandler {
 
     // Mention users
-    public MentionTypeFormatHandler(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
+    public MentionTypeFormatHandler(AsyncPlayerChatEvent e, HashSet<Player> mentioned, MentionChat plugin) {
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 
@@ -76,7 +76,7 @@ public class MentionTypeFormatHandler {
     }
 
     // Mention everyone
-    public MentionTypeFormatHandler(AsyncPlayerChatEvent e, Player mentioner, MentionChat plugin) {
+    public MentionTypeFormatHandler(AsyncPlayerChatEvent e, MentionChat plugin) {
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 

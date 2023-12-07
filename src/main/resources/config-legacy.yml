@@ -10,6 +10,7 @@
 checkForUpdates: true
 
 # By default, how should the player be mentioned? Multiple can be used at once.
+# Players can change this in game with /mentionchat settings toggle <type>
 # Possible values: FORMAT, MESSAGE, TITLE
 # Example: [FORMAT, TITLE]
 mentionType: [FORMAT]
@@ -25,6 +26,7 @@ mentionSymbol: "@"
 mentionedSound: SUCCESSFUL_HIT
 
 # How long (in seconds) should the mentions be displayed for (if applicable)?
+# This can be overridden by players in game with /mentionchat settings duration <duration>
 mentionedDuration: 5
 
 # How much time (in seconds) should there be in between mentions?
@@ -42,10 +44,12 @@ mentionCooldown: 3
 mentionedFormat: "&6&l%mention%&r"
 
 # If you chose MESSAGE, what message should be sent?
+# This can be overridden by players in game with /mentionchat settings message <message>
 # %player% is the placeholder of the player's name
 mentionedMessage: "&6You were mentioned by &e%player%"
 
 # If you chose TITLE, what should the title look like?
+# These can be overridden by players in game with /mentionchat settings title <title> and /mentionchat settings subtitle <subtitle>
 # %player% is the placeholder of the player's name
 mentionedTitle: "&6You were mentioned!"
 mentionedSubtitle: "&6You were mentioned by &e%player%!"
@@ -64,7 +68,7 @@ playerMentionDisabled: "&4%mention% has mentions disabled!"
 # What should you see when you try to mention people during the cooldown?
 cooldownMessage: "&4Please don't try to spam mention people."
 
-# When you don't have permission to mention someone, send this message:
+# When you don't have permission to mention someone, send this message.
 noPermissionMessage: "&4You don't have permission to mention them!"
 
 # DO NOT TOUCH THIS

@@ -53,10 +53,6 @@ public class MentionTypeActionbarHandler {
 
     // doesn't support duration, at least without NMS
     private void sendActionbar(Player player, String message) {
-        if (Utils.isLegacyVersion()) {
-            // TODO: get actionbars to work on 1.8 with reflection help im actually dying from this bro
-        } else {
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.color(message.replace("%player%", player.getName()))));
-        }
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Utils.color(message.replace("%player%", player.getName()))));
     }
 }

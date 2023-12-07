@@ -7,6 +7,8 @@ import me.jovannmc.mentionchat.tabcompleters.MentionChatCommandTabCompleter;
 import me.jovannmc.mentionchat.utils.UpdateChecker;
 import me.jovannmc.mentionchat.utils.Utils;
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.AdvancedPie;
+import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -19,6 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 
 public class MentionChat extends JavaPlugin implements Listener {
@@ -29,7 +33,6 @@ public class MentionChat extends JavaPlugin implements Listener {
      */
 
     // TODO: IMPORTANT! make the plugin work with other plugins that mess with chat formatting, plugin currently overrides it with default minecraft formatting
-    // TODO: add custom graphs to bStats (mentionType, graphs for if using default options or not?)
 
     private final File configFile = new File(getDataFolder() + File.separator, "config.yml");
     private final File dataFile = new File(getDataFolder() + File.separator, "data.yml");
@@ -43,9 +46,14 @@ public class MentionChat extends JavaPlugin implements Listener {
         Bukkit.getPluginCommand("mentionchat").setTabCompleter(new MentionChatCommandTabCompleter());
         Bukkit.getPluginManager().registerEvents(new MentionHandler(), this);
         Bukkit.getPluginManager().registerEvents(new QuickMentionHandler(), this);
-        new Metrics(this, 19327);
+        bStats();
 
         Bukkit.getLogger().log(Level.INFO, "MentionChat v" + getDescription().getVersion() + " has been enabled! Server version: " + Utils.getServerVersion());
+        if (Utils.isUnsupportedVersion()) {
+            Bukkit.getLogger().log(Level.SEVERE, "You are using an unsupported version of Minecraft" + Utils.getServerVersion() + ". Expect bugs and issues.");
+        } else if (Utils.isLegacyVersion()) {
+            Bukkit.getLogger().log(Level.WARNING, "You are using a legacy version of Minecraft" + Utils.getServerVersion() + ". Some features have been adjusted/removed to work with this version.");
+        }
 
         // Check for updates
         if (getConfig().getBoolean("checkForUpdates")) {
@@ -57,21 +65,34 @@ public class MentionChat extends JavaPlugin implements Listener {
                 }
             });
         }
+    }
 
-        String[] legacyVersions = {"v1_11", "v1_10", "v1_9", "v1_8", "v1_7", "v1_6"};
-        for (String legacyVersion : legacyVersions) {
-            if (Utils.getServerVersion().startsWith(legacyVersion)) {
-                Bukkit.getLogger().log(Level.WARNING, "You are using a legacy version of Minecraft (" + Utils.getServerVersion() + "). Please update to a newer version of Minecraft.");
-                Bukkit.getLogger().log(Level.WARNING, "MentionChat may not work properly on this version of Minecraft.");
+    private void bStats() {
+        Metrics metrics = new Metrics(this, 19327);
+        metrics.addCustomChart(new SimplePie("checkForUpdates", () -> getConfig().getBoolean("checkForUpdates") ? "true" : "false"));
+        metrics.addCustomChart(new AdvancedPie("mentionType", () -> {
+            HashMap<String, Integer> valueMap = new HashMap<>();
+            List<String> mentionTypes = getConfig().getStringList("mentionTypes");
+            for (String mentionType : mentionTypes) {
+                valueMap.put(mentionType, 1);
             }
+            return valueMap;
+        }));
+        metrics.addCustomChart(new SimplePie("mentionedSound", () -> getConfig().getString("mentionedSound")));
+
+        String mentionSymbol = getConfig().getString("mentionSymbol");
+        if (mentionSymbol.isEmpty()) {
+            metrics.addCustomChart(new SimplePie("mentionSymbol", () -> "none"));
+        } else {
+            metrics.addCustomChart(new SimplePie("mentionSymbol", () -> getConfig().getString("mentionSymbol")));
         }
     }
 
-    public void configTasks() {
+    private void configTasks() {
         boolean firstRun = false;
         if (!configFile.exists()) {
             configFile.getParentFile().mkdirs();
-            if (Utils.isLegacyVersion()) {
+            if (Utils.isUnsupportedVersion()) {
                 // Save config-legacy.yml
                 saveResource("config-legacy.yml", false);
                 // Copy contents from config-legacy.yml to config.yml

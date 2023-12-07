@@ -28,7 +28,7 @@ public class MentionHandler implements Listener {
         Player mentioner = e.getPlayer();
 
         // Split the message into words and check if any of them are a player's name
-        // This is done to prevent similar names from causing issues (eg JovannMC and JovannMC2 being highlighted when only JovannMC2 was mentioned)
+        // This is done to prevent similar names from causing issues (e.g. JovannMC and JovannMC2 being highlighted when only JovannMC2 was mentioned)
         for (String word : words) {
             if (mentionSymbol.isEmpty()) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
@@ -97,7 +97,7 @@ public class MentionHandler implements Listener {
 
         // Check mention type and handle mention accordingly
         if (getConfig().getString("mentionType").contains("FORMAT")) {
-            new MentionTypeFormatHandler(e, mentioner, mentioned, plugin);
+            new MentionTypeFormatHandler(e, mentioned, plugin);
             Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "FORMAT"));
         }
         if (getConfig().getString("mentionType").contains("MESSAGE")) {
@@ -136,7 +136,7 @@ public class MentionHandler implements Listener {
 
         // Check mention type and handle mention accordingly
         if (getConfig().getString("mentionType").contains("FORMAT")) {
-            new MentionTypeFormatHandler(e, mentioner, plugin);
+            new MentionTypeFormatHandler(e, plugin);
             Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "FORMAT"));
         }
         if (getConfig().getString("mentionType").contains("MESSAGE")) {
@@ -147,13 +147,15 @@ public class MentionHandler implements Listener {
             new MentionTypeTitleHandler(mentioner, plugin);
             Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "TITLE"));
         }
-        if (getConfig().getString("mentionType").contains("BOSSBAR")) {
-            new MentionTypeBossbarHandler(mentioner, plugin);
-            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "BOSSBAR"));
-        }
-        if (getConfig().getString("mentionType").contains("ACTIONBAR")) {
-            new MentionTypeActionbarHandler(mentioner, plugin);
-            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "ACTIONBAR"));
+        if (!Utils.isUnsupportedVersion()) {
+            if (getConfig().getString("mentionType").contains("BOSSBAR")) {
+                new MentionTypeBossbarHandler(mentioner, plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "BOSSBAR"));
+            }
+            if (getConfig().getString("mentionType").contains("ACTIONBAR")) {
+                new MentionTypeActionbarHandler(mentioner, plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "ACTIONBAR"));
+            }
         }
         nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
     }

@@ -1,5 +1,6 @@
 package me.jovannmc.mentionchat.tabcompleters;
 
+import me.jovannmc.mentionchat.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -53,8 +54,8 @@ public class MentionChatCommandTabCompleter implements TabCompleter {
                         completions.add(sound.name());
                     }
                 } else if (args[1].equalsIgnoreCase("type")) {
-                    // /mentionchat settings type <format/message/title/actionbar/bossbar>
-                    String[] mentionTypes = {"format", "message", "title", "actionbar", "bossbar"};
+                    // /mentionchat settings type <format/message/title/actionbar/bossbar> or /mentionchat settings type <format/message/title>
+                    String[] mentionTypes = Utils.isUnsupportedVersion() ? new String[]{"mentions", "format", "message"} : new String[]{"mentions", "format", "message", "title", "actionbar", "bossbar"};
                     for (String mentionType : mentionTypes) {
                         if (mentionType.startsWith(args[2])) {
                             completions.add(mentionType);

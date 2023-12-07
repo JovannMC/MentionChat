@@ -82,8 +82,6 @@ public class MentionTypeBossbarHandler {
     }
 
     private void sendBossbar(MentionChat plugin, Player player, String message, String color, int duration) {
-        if (Utils.isLegacyVersion()) return;
-
         BossBar bossBar = Bukkit.createBossBar(Utils.color(message.replace("%player%", player.getName())), BarColor.valueOf(color), BarStyle.SEGMENTED_10);
         bossBar.addPlayer(player);
 

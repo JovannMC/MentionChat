@@ -86,7 +86,6 @@ public class MentionTypeTitleHandler {
     public void sendTitle(Player player, String title, String subtitle, int stayTime) {
         String[] legacyVersions = {"v1_10", "v1_9"};
         for (String legacyVersion : legacyVersions) {
-            if (Utils.isLegacyVersion()) { return; }
             if (Utils.getServerVersion().startsWith(legacyVersion)) {
                 sendTitleLegacy(player, title, subtitle, stayTime);
                 return;
@@ -122,7 +121,7 @@ public class MentionTypeTitleHandler {
         }
     }
 
-    // i dont know how any of this works help
+    // I don't know how any of this works help
     private void sendPacket(Player player, Object packet, int stayTime) {
         int stayTimeSeconds = stayTime * 20;
         try {
