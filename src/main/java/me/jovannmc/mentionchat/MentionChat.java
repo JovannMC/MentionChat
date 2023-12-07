@@ -30,7 +30,6 @@ public class MentionChat extends JavaPlugin implements Listener {
 
     // TODO: IMPORTANT! make the plugin work with other plugins that mess with chat formatting, plugin currently overrides it with default minecraft formatting
     // TODO: add custom graphs to bStats (mentionType, graphs for if using default options or not?)
-    // TODO: add warning message for using old server versions (test acitonbar, bossbar on 1.9-1.12)
 
     private final File configFile = new File(getDataFolder() + File.separator, "config.yml");
     private final File dataFile = new File(getDataFolder() + File.separator, "data.yml");
@@ -57,6 +56,14 @@ public class MentionChat extends JavaPlugin implements Listener {
                     Bukkit.getLogger().info("There is a new update available for MentionChat (v" + version + "). Please update at https://www.spigotmc.org/resources/111656/");
                 }
             });
+        }
+
+        String[] legacyVersions = {"v1_11", "v1_10", "v1_9", "v1_8", "v1_7", "v1_6"};
+        for (String legacyVersion : legacyVersions) {
+            if (Utils.getServerVersion().startsWith(legacyVersion)) {
+                Bukkit.getLogger().log(Level.WARNING, "You are using a legacy version of Minecraft (" + Utils.getServerVersion() + "). Please update to a newer version of Minecraft.");
+                Bukkit.getLogger().log(Level.WARNING, "MentionChat may not work properly on this version of Minecraft.");
+            }
         }
     }
 

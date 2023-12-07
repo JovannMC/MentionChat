@@ -33,8 +33,6 @@ public class MentionHandler implements Listener {
             if (mentionSymbol.isEmpty()) {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (word.equalsIgnoreCase(player.getName())) {
-                        // TODO: fix possible bug with no mention symbols, where players could be mentioned with only part of their name
-                        // seems like this also plays the mention sound, but doesn't format/highlight message for the mentioned player
                         mentionedPlayers.add(player);
                     }
                 }
@@ -49,7 +47,7 @@ public class MentionHandler implements Listener {
                 return;
             } else if (word.startsWith(mentionSymbol)) {
                 String playerName = word.substring(mentionSymbol.length());
-                Player mentionedPlayer = Bukkit.getPlayer(playerName);
+                Player mentionedPlayer = Bukkit.getPlayerExact(playerName);
                 if (mentionedPlayer != null) {
                     mentionedPlayers.add(mentionedPlayer);
                 }
@@ -159,7 +157,6 @@ public class MentionHandler implements Listener {
         }
         nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
     }
-
 
     private FileConfiguration getConfig() {
         return plugin.getConfig();

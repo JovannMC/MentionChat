@@ -84,8 +84,9 @@ public class MentionTypeTitleHandler {
     }
 
     public void sendTitle(Player player, String title, String subtitle, int stayTime) {
-        String[] legacyVersions = {"1_10", "1_9", "v1_8", "v1_7", "v1_6"};
+        String[] legacyVersions = {"v1_10", "v1_9"};
         for (String legacyVersion : legacyVersions) {
+            if (Utils.isLegacyVersion()) { return; }
             if (Utils.getServerVersion().startsWith(legacyVersion)) {
                 sendTitleLegacy(player, title, subtitle, stayTime);
                 return;
@@ -95,7 +96,7 @@ public class MentionTypeTitleHandler {
         player.sendTitle(Utils.color(title), Utils.color(subtitle), 10, stayTime * 20, 20);
     }
 
-    // For versions below 1.11
+    // For versions 1.10 and 1.9
     private void sendTitleLegacy(Player player, String title, String subtitle, int stayTime) {
         try {
             String nmsPackage = "net.minecraft.server." + Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
