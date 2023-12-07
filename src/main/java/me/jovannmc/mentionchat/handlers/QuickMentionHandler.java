@@ -1,6 +1,8 @@
 package me.jovannmc.mentionchat.handlers;
 
 import me.jovannmc.mentionchat.MentionChat;
+import me.jovannmc.mentionchat.events.EveryoneMentionEvent;
+import me.jovannmc.mentionchat.events.MultiPlayerMentionEvent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -47,5 +49,11 @@ public class QuickMentionHandler implements Listener {
     public void onPlayerMention(PlayerMentionEvent event) {
         mentionEventOccurred = true;
     }
+
+    @EventHandler
+    public void onMultiPlayerMention(MultiPlayerMentionEvent event) { mentionEventOccurred = true; }
+
+    @EventHandler
+    public void onEveryoneMention(EveryoneMentionEvent event) { mentionEventOccurred = true; }
 
 }
