@@ -8,15 +8,35 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.HashSet;
 
 public class MentionTypeActionbarHandler {
 
-    // Mention Users
-    public MentionTypeActionbarHandler(Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
+    // Mention single user
+    public MentionTypeActionbarHandler(AsyncPlayerChatEvent e, Player mentioned, MentionChat plugin) {
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
+        Player mentioner = e.getPlayer();
+
+        String message;
+
+        if (data.contains(mentioner.getUniqueId().toString() + ".actionbar")) {
+            message = ChatColor.translateAlternateColorCodes('&', data.getString(mentioner.getUniqueId().toString() + ".actionbar").replace("%player%", mentioner.getName()));
+        } else {
+            message = ChatColor.translateAlternateColorCodes('&', config.getString(".mentionedActionbar"));
+        }
+
+        plugin.playMentionSound(mentioned);
+        sendActionbar(mentioned, message);
+    }
+
+    // Mention multiple users
+    public MentionTypeActionbarHandler(AsyncPlayerChatEvent e, HashSet<Player> mentioned, MentionChat plugin) {
+        FileConfiguration config = plugin.getConfig();
+        FileConfiguration data = plugin.getData();
+        Player mentioner = e.getPlayer();
 
         String message;
 
@@ -33,9 +53,10 @@ public class MentionTypeActionbarHandler {
     }
 
     // Mention everyone
-    public MentionTypeActionbarHandler(Player mentioner, MentionChat plugin) {
+    public MentionTypeActionbarHandler(AsyncPlayerChatEvent e, MentionChat plugin) {
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
+        Player mentioner = e.getPlayer();
 
         String message;
 

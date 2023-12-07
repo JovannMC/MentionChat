@@ -1,6 +1,8 @@
 package me.jovannmc.mentionchat.handlers;
 
 import me.jovannmc.mentionchat.MentionChat;
+import me.jovannmc.mentionchat.events.EveryoneMentionEvent;
+import me.jovannmc.mentionchat.events.MultiPlayerMentionEvent;
 import me.jovannmc.mentionchat.events.PlayerMentionEvent;
 import me.jovannmc.mentionchat.utils.Utils;
 import org.bukkit.Bukkit;
@@ -59,11 +61,11 @@ public class MentionHandler implements Listener {
         }
     }
 
-    private void mentionUser(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned) {
+    private void mentionUser(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentionedPlayers) {
         // Check if player has mentions disabled
         List<Player> playersToRemove = new ArrayList<>();
         if (!mentioner.hasPermission("mentionchat.mention.bypass") || !mentioner.hasPermission("mentionchat.mention.bypass.toggle")) {
-            for (Player mentionedPlayer : mentioned) {
+            for (Player mentionedPlayer : mentionedPlayers) {
                 if (plugin.getData().contains(mentionedPlayer.getUniqueId().toString() + ".toggle.mentions") && !plugin.getData().getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle.mentions")) {
                     playersToRemove.add(mentionedPlayer);
                 } else if (mentionedPlayer.hasPermission("mentionchat.mention.exempt") && (!mentioner.hasPermission("mentionchat.mention.bypass.exempt") || !mentioner.hasPermission("mentionchat.mention.bypass"))) {
@@ -71,7 +73,7 @@ public class MentionHandler implements Listener {
                 }
             }
             if (!playersToRemove.isEmpty()) {
-                playersToRemove.forEach(mentioned::remove);
+                playersToRemove.forEach(mentionedPlayers::remove);
                 List<String> names = new ArrayList<>();
                 for (Player player : playersToRemove) {
                     names.add(player.getName());
@@ -96,28 +98,108 @@ public class MentionHandler implements Listener {
         }
 
         // Check mention type and handle mention accordingly
-        if (getConfig().getString("mentionType").contains("FORMAT")) {
-            new MentionTypeFormatHandler(e, mentioned, plugin);
-            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "FORMAT"));
-        }
-        if (getConfig().getString("mentionType").contains("MESSAGE")) {
-            new MentionTypeMessageHandler(e, mentioner, mentioned, plugin);
-            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "MESSAGE"));
-        }
-        if (getConfig().getString("mentionType").contains("TITLE")) {
-            new MentionTypeTitleHandler(mentioner, mentioned, plugin);
-            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "TITLE"));
-        }
-        if (!Utils.isUnsupportedVersion()) {
-            if (getConfig().getString("mentionType").contains("BOSSBAR")) {
-                new MentionTypeBossbarHandler(mentioner, mentioned, plugin);
-                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "BOSSBAR"));
+
+        // Single player mentioned
+        if (mentionedPlayers.size() == 1) {
+            System.out.println("single player mentioned");
+            Player mentioned = mentionedPlayers.iterator().next();
+            String uuid = mentioned.getUniqueId().toString();
+
+            // Check player's data if mention type is toggled, if not found, check config for defaults
+            if ((plugin.getData().contains(uuid + ".toggle.format") && plugin.getData().getBoolean(uuid + ".toggle.format")) || (getConfig().getString("mentionType").contains("FORMAT") && !plugin.getData().contains(uuid + ".toggle.format"))) {
+                new MentionTypeFormatHandler(e, mentioned, plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(e, mentioned, "FORMAT"));
             }
-            if (getConfig().getString("mentionType").contains("ACTIONBAR")) {
-                new MentionTypeActionbarHandler(mentioner, mentioned, plugin);
-                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "ACTIONBAR"));
+
+            if ((plugin.getData().getBoolean(uuid + ".toggle.message") && plugin.getData().getBoolean(uuid + ".toggle.message")) || (getConfig().getString("mentionType").contains("MESSAGE") && !plugin.getData().contains(uuid + ".toggle.message"))) {
+                new MentionTypeMessageHandler(e, mentioned, plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(e, mentioned, "MESSAGE"));
+            }
+
+            if ((plugin.getData().getBoolean(uuid + ".toggle.title") && plugin.getData().getBoolean(uuid + ".toggle.title")) || (getConfig().getString("mentionType").contains("TITLE") && !plugin.getData().contains(uuid + ".toggle.title"))) {
+                new MentionTypeTitleHandler(e, mentioned, plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(e, mentioned, "TITLE"));
+            }
+
+            if (!Utils.isUnsupportedVersion()) {
+                if ((plugin.getData().getBoolean(uuid + ".toggle.bossbar") && plugin.getData().getBoolean(uuid + ".toggle.bossbar")) || (getConfig().getString("mentionType").contains("BOSSBAR") && !plugin.getData().contains(uuid + ".toggle.bossbar"))) {
+                    new MentionTypeBossbarHandler(e, mentioned, plugin);
+                    Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(e, mentioned, "BOSSBAR"));
+                }
+
+                if ((plugin.getData().getBoolean(uuid + ".toggle.actionbar") && plugin.getData().getBoolean(uuid + ".toggle.actionbar")) || (getConfig().getString("mentionType").contains("ACTIONBAR") && !plugin.getData().contains(uuid + ".toggle.actionbar"))) {
+                    new MentionTypeActionbarHandler(e, mentioned, plugin);
+                    Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(e, mentioned, "ACTIONBAR"));
+                }
             }
         }
+
+        boolean formatEventCalled = false;
+        boolean messageEventCalled = false;
+        boolean titleEventCalled = false;
+        boolean bossbarEventCalled = false;
+        boolean actionbarEventCalled = false;
+
+        // Multiple players mentioned
+        if (mentionedPlayers.size() > 1) {
+            System.out.println("multiple players mentioned");
+            for (Player mentioned : mentionedPlayers) {
+                String uuid = mentioned.getUniqueId().toString();
+                // Check player's data if mention type is toggled, if not found, check config for defaults
+                if ((plugin.getData().contains(uuid + ".toggle.format") && plugin.getData().getBoolean(uuid + ".toggle.format")) || (getConfig().getString("mentionType").contains("FORMAT") && !plugin.getData().contains(uuid + ".toggle.format"))) {
+                    new MentionTypeFormatHandler(e, mentioned, plugin);
+                    System.out.println("call mentionTypeFormatHandler");
+                    if (!formatEventCalled) {
+                        Bukkit.getPluginManager().callEvent(new MultiPlayerMentionEvent(e, mentionedPlayers, "FORMAT"));
+                        formatEventCalled = true;
+                        System.out.println("call MultiPlayerMentionEvent");
+                    }
+                }
+
+                if ((plugin.getData().getBoolean(uuid + ".toggle.message") && plugin.getData().getBoolean(uuid + ".toggle.message")) || (getConfig().getString("mentionType").contains("MESSAGE") && !plugin.getData().contains(uuid + ".toggle.message"))) {
+                    new MentionTypeMessageHandler(e, mentioned, plugin);
+                    System.out.println("call mentionTypeMessageHandler");
+                    if (!messageEventCalled) {
+                        Bukkit.getPluginManager().callEvent(new MultiPlayerMentionEvent(e, mentionedPlayers, "MESSAGE"));
+                        messageEventCalled = true;
+                        System.out.println("call MultiPlayerMentionEvent");
+                    }
+                }
+
+                if ((plugin.getData().getBoolean(uuid + ".toggle.title") && plugin.getData().getBoolean(uuid + ".toggle.title")) || (getConfig().getString("mentionType").contains("TITLE") && !plugin.getData().contains(uuid + ".toggle.title"))) {
+                        new MentionTypeTitleHandler(e, mentioned, plugin);
+                        System.out.println("call mentionTypeTitleHandler");
+                    if (!titleEventCalled) {
+                        Bukkit.getPluginManager().callEvent(new MultiPlayerMentionEvent(e, mentionedPlayers, "TITLE"));
+                        titleEventCalled = true;
+                        System.out.println("call MultiPlayerMentionEvent");
+                    }
+                }
+
+                if (!Utils.isUnsupportedVersion()) {
+                    if ((plugin.getData().getBoolean(uuid + ".toggle.bossbar") && plugin.getData().getBoolean(uuid + ".toggle.bossbar")) || (getConfig().getString("mentionType").contains("BOSSBAR") && !plugin.getData().contains(uuid + ".toggle.bossbar"))) {
+                        new MentionTypeBossbarHandler(e, mentioned, plugin);
+                        System.out.println("call mentionTypeBossbarHandler");
+                        if (!bossbarEventCalled) {
+                            Bukkit.getPluginManager().callEvent(new MultiPlayerMentionEvent(e, mentionedPlayers, "BOSSBAR"));
+                            bossbarEventCalled = true;
+                            System.out.println("call MultiPlayerMentionEvent");
+                        }
+                    }
+
+                    if ((plugin.getData().getBoolean(uuid + ".toggle.actionbar") && plugin.getData().getBoolean(uuid + ".toggle.actionbar")) || (getConfig().getString("mentionType").contains("ACTIONBAR") && !plugin.getData().contains(uuid + ".toggle.actionbar"))) {
+                        new MentionTypeActionbarHandler(e, mentioned, plugin);
+                        System.out.println("call mentionTypeActionbarHandler");
+                        if (!actionbarEventCalled) {
+                            Bukkit.getPluginManager().callEvent(new MultiPlayerMentionEvent(e, mentionedPlayers, "ACTIONBAR"));
+                            actionbarEventCalled = true;
+                            System.out.println("call MultiPlayerMentionEvent");
+                        }
+                    }
+                }
+            }
+        }
+
         nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
     }
 
@@ -135,28 +217,34 @@ public class MentionHandler implements Listener {
         }
 
         HashSet<Player> onlinePlayers = new HashSet<>(Bukkit.getOnlinePlayers());
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (plugin.getData().contains(player.getUniqueId().toString() + ".toggle.mentions") && !plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.mentions")) {
+                onlinePlayers.remove(player);
+            }
+        }
+
 
         // Check mention type and handle mention accordingly
         if (getConfig().getString("mentionType").contains("FORMAT")) {
             new MentionTypeFormatHandler(e, plugin);
-            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "FORMAT"));
+            Bukkit.getPluginManager().callEvent(new EveryoneMentionEvent(e, onlinePlayers, "FORMAT"));
         }
         if (getConfig().getString("mentionType").contains("MESSAGE")) {
-            new MentionTypeMessageHandler(e, mentioner, plugin);
-            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "MESSAGE"));
+            new MentionTypeMessageHandler(e, plugin);
+            Bukkit.getPluginManager().callEvent(new EveryoneMentionEvent(e, onlinePlayers, "MESSAGE"));
         }
         if (getConfig().getString("mentionType").contains("TITLE")) {
-            new MentionTypeTitleHandler(mentioner, plugin);
-            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "TITLE"));
+            new MentionTypeTitleHandler(e, plugin);
+            Bukkit.getPluginManager().callEvent(new EveryoneMentionEvent(e, onlinePlayers, "TITLE"));
         }
         if (!Utils.isUnsupportedVersion()) {
             if (getConfig().getString("mentionType").contains("BOSSBAR")) {
-                new MentionTypeBossbarHandler(mentioner, plugin);
-                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "BOSSBAR"));
+                new MentionTypeBossbarHandler(e, plugin);
+                Bukkit.getPluginManager().callEvent(new EveryoneMentionEvent(e, onlinePlayers, "BOSSBAR"));
             }
             if (getConfig().getString("mentionType").contains("ACTIONBAR")) {
-                new MentionTypeActionbarHandler(mentioner, plugin);
-                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, onlinePlayers, "ACTIONBAR"));
+                new MentionTypeActionbarHandler(e, plugin);
+                Bukkit.getPluginManager().callEvent(new EveryoneMentionEvent(e, onlinePlayers, "ACTIONBAR"));
             }
         }
         nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());

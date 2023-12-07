@@ -7,19 +7,19 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.HashSet;
 
-public class PlayerMentionEvent extends Event {
+public class MultiPlayerMentionEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
 
     private boolean isCancelled;
 
     private Player mentioner;
-    private Player mentionedPlayer;
+    private HashSet<Player> mentionedPlayers;
     private String mentionType;
 
-    public PlayerMentionEvent(AsyncPlayerChatEvent e, Player mentionedPlayer, String mentionType) {
+    public MultiPlayerMentionEvent(AsyncPlayerChatEvent e, HashSet<Player> mentionedPlayers, String mentionType) {
         this.mentioner = e.getPlayer();
-        this.mentionedPlayer = mentionedPlayer;
+        this.mentionedPlayers = mentionedPlayers;
         this.mentionType = mentionType;
     }
 
@@ -46,8 +46,8 @@ public class PlayerMentionEvent extends Event {
         return this.mentioner;
     }
 
-    public Player getMentionedPlayer() {
-        return this.mentionedPlayer;
+    public HashSet<Player> getMentionedPlayers() {
+        return this.mentionedPlayers;
     }
 
     public String getMentionType() {

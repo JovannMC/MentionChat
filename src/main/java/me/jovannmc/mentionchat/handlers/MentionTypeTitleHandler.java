@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -15,10 +16,44 @@ import java.util.logging.Level;
 
 public class MentionTypeTitleHandler {
 
-    // Mention Users
-    public MentionTypeTitleHandler(Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
+    // Mention single user
+    public MentionTypeTitleHandler(AsyncPlayerChatEvent e, Player mentioned, MentionChat plugin) {
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
+        Player mentioner = e.getPlayer();
+
+        // Get the title and subtitle from user data, if not found, use the default title and subtitle from config and then send the title/subtitle to player
+        String title;
+        String subtitle;
+        int duration;
+        if (data.contains(e.getPlayer().getUniqueId().toString() + ".title.title")) {
+            title = ChatColor.translateAlternateColorCodes('&', data.getString(mentioner.getUniqueId().toString() + ".title.title").replace("%player%", mentioner.getName()));
+        } else {
+            title = ChatColor.translateAlternateColorCodes('&', config.getString(".mentionedTitle").replace("%player%", mentioner.getName()));
+        }
+
+        if (data.contains(mentioner.getUniqueId().toString() + ".title.subtitle")) {
+            subtitle = ChatColor.translateAlternateColorCodes('&', data.getString(mentioner.getUniqueId().toString() + ".title.subtitle").replace("%player%", mentioner.getName()));
+        } else {
+            subtitle = ChatColor.translateAlternateColorCodes('&', config.getString(".mentionedSubtitle").replace("%player%", mentioner.getName()));
+        }
+
+        if (data.contains(mentioner.getUniqueId().toString() + ".duration")) {
+            duration = data.getInt(mentioner.getUniqueId().toString() + ".duration");
+        } else {
+            duration = config.getInt("mentionedDuration");
+        }
+
+        // send title
+        plugin.playMentionSound(mentioned);
+        sendTitle(mentioned, title, subtitle, duration);
+    }
+
+    // Mention multiple users
+    public MentionTypeTitleHandler(AsyncPlayerChatEvent e, HashSet<Player> mentioned, MentionChat plugin) {
+        FileConfiguration config = plugin.getConfig();
+        FileConfiguration data = plugin.getData();
+        Player mentioner = e.getPlayer();
 
         // Get the title and subtitle from user data, if not found, use the default title and subtitle from config and then send the title/subtitle to player
         String title;
@@ -50,9 +85,10 @@ public class MentionTypeTitleHandler {
     }
 
     // Mention everyone
-    public MentionTypeTitleHandler(Player mentioner, MentionChat plugin) {
+    public MentionTypeTitleHandler(AsyncPlayerChatEvent e, MentionChat plugin) {
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
+        Player mentioner = e.getPlayer();
 
         // Get the title and subtitle from user data, if not found, use the default title and subtitle from config and then send the title/subtitle to player
         String title;
