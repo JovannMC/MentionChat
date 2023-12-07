@@ -67,7 +67,7 @@ public class MentionChatCommand implements CommandExecutor {
         final String lineSeparator = "\n";
 
         if (args.length == 1 || (args.length == 2 && args[1].equalsIgnoreCase("1"))) {
-            String header = Utils.isUnsupportedVersion() ? "&8-----------&a&lMentionChat General &7(1/4)&8-------------" : "&8-------------&a&lMentionChat General &7(1/4)&8--------------";
+            String header = Utils.isOldVersion() ? "&8-----------&a&lMentionChat General &7(1/4)&8-------------" : "&8-------------&a&lMentionChat General &7(1/4)&8--------------";
             infoMessage.addExtra(Utils.color(header));
 
             infoMessage.addExtra(lineSeparator + lineSeparator);
@@ -80,11 +80,11 @@ public class MentionChatCommand implements CommandExecutor {
             infoMessage.addExtra(createHoverableCommand("&6/mentionchat settings <toggle/type/sound/duration>: &rChange your MentionChat settings", "/mentionchat settings ", hoverText));
             infoMessage.addExtra(lineSeparator + lineSeparator);
 
-            String footer = Utils.isUnsupportedVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
+            String footer = Utils.isOldVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
             infoMessage.addExtra(new TextComponent(Utils.color(footer)));
         } else if (args.length == 2) {
             if (args[1].equalsIgnoreCase("2")) {
-                String header = Utils.isUnsupportedVersion() ? "&8-----------&a&l/mentionchat settings &7(2/4)&8------------" : "&8-------------&a&l/mentionchat settings &7(2/4)&8-------------";
+                String header = Utils.isOldVersion() ? "&8-----------&a&l/mentionchat settings &7(2/4)&8------------" : "&8-------------&a&l/mentionchat settings &7(2/4)&8-------------";
                 infoMessage.addExtra(Utils.color(header));
 
                 infoMessage.addExtra(lineSeparator + lineSeparator);
@@ -97,10 +97,10 @@ public class MentionChatCommand implements CommandExecutor {
                 infoMessage.addExtra(createHoverableCommand("&6..type <format/message/title/bossbar>:&r Change settings for different mention types", "/mentionchat settings type ", hoverText));
                 infoMessage.addExtra(lineSeparator + lineSeparator);
 
-                String footer = Utils.isUnsupportedVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
+                String footer = Utils.isOldVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
                 infoMessage.addExtra(Utils.color(footer));
             } else if (args[1].equalsIgnoreCase("3")) {
-                String header = Utils.isUnsupportedVersion() ? "&8---------&a&l/mentionchat settings type &7(3/4)&8---------" : "&8-----------&a&l/mentionchat settings type &7(3/4)&8----------";
+                String header = Utils.isOldVersion() ? "&8---------&a&l/mentionchat settings type &7(3/4)&8---------" : "&8-----------&a&l/mentionchat settings type &7(3/4)&8----------";
                 infoMessage.addExtra(Utils.color(header));
 
                 infoMessage.addExtra(lineSeparator + lineSeparator);
@@ -113,17 +113,17 @@ public class MentionChatCommand implements CommandExecutor {
                 infoMessage.addExtra(createHoverableCommand("&6..bossbar (text/color): &rChange your mention bossbar settings", "/mentionchat settings type bossbar ", hoverText));
                 infoMessage.addExtra(lineSeparator + lineSeparator);
 
-                String footer = Utils.isUnsupportedVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
+                String footer = Utils.isOldVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
                 infoMessage.addExtra(Utils.color(footer));
             } else if (args[1].equalsIgnoreCase("4")) {
-                String header = Utils.isUnsupportedVersion() ? "&8---------&a&l/mentionchat settings type &7(4/4)&8---------" : "&8----------&a&l/mentionchat settings type &7(4/4)&8-----------";
+                String header = Utils.isOldVersion() ? "&8---------&a&l/mentionchat settings type &7(4/4)&8---------" : "&8----------&a&l/mentionchat settings type &7(4/4)&8-----------";
                 infoMessage.addExtra(Utils.color(header));
 
                 infoMessage.addExtra(lineSeparator + lineSeparator);
                 infoMessage.addExtra(createHoverableCommand("&6..actionbar (actionbar): &rChange your mention actionbar", "/mentionchat settings type actionbar ", hoverText));
                 infoMessage.addExtra(lineSeparator + lineSeparator);
 
-                String footer = Utils.isUnsupportedVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
+                String footer = Utils.isOldVersion() ? "&8--------------------------------------------------" : "&8-----------------------------------------------------";
                 infoMessage.addExtra(Utils.color(footer));
             } else {
                 Utils.sendMessage(sender, "&cInvalid usage. /mentionchat help (1-3)");
@@ -152,7 +152,7 @@ public class MentionChatCommand implements CommandExecutor {
 
         if (args[1].equalsIgnoreCase("toggle")) {
             if (args.length != 3) {
-                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings toggle " + (Utils.isLegacyVersion() ? "<mentions/format/message>" : "<mentions/format/message/title/bossbar>"));
+                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings toggle " + (Utils.isLegacyVersion() ? "<mentions/format/message/title>" : "<mentions/format/message/title/bossbar>"));
                 return;
             }
 
@@ -180,7 +180,7 @@ public class MentionChatCommand implements CommandExecutor {
                 Utils.sendMessage(sender, prefix + " &aToggled " + toggle + " " + toggleValue + ".");
                 return;
             }
-            Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings toggle " + (Utils.isLegacyVersion() ? "<mentions/format/message>" : "<mentions/format/message/title/bossbar>"));
+            Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings toggle " + (Utils.isLegacyVersion() ? "<mentions/format/message/title>" : "<mentions/format/message/title/bossbar>"));
         } else if (args[1].equalsIgnoreCase("sound")) {
             if (args.length != 3) {
                 Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings sound <sound>");

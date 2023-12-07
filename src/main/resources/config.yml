@@ -27,7 +27,7 @@ mentionedSound: ENTITY_ARROW_HIT_PLAYER
 
 # How long (in seconds) should the mentions be displayed for (if applicable)?
 # This can be overridden by players in game with /mentionchat settings duration <duration>
-mentionedDuration: 5
+mentionedDuration: 3
 
 # How much time (in seconds) should there be in between mentions?
 # Used to prevent mention spam and can be paired alongside other anti-spam plugins.

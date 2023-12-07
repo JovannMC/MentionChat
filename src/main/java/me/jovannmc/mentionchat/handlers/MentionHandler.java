@@ -108,13 +108,15 @@ public class MentionHandler implements Listener {
             new MentionTypeTitleHandler(mentioner, mentioned, plugin);
             Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "TITLE"));
         }
-        if (getConfig().getString("mentionType").contains("BOSSBAR")) {
-            new MentionTypeBossbarHandler(mentioner, mentioned, plugin);
-            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "BOSSBAR"));
-        }
-        if (getConfig().getString("mentionType").contains("ACTIONBAR")) {
-            new MentionTypeActionbarHandler(mentioner, mentioned, plugin);
-            Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "ACTIONBAR"));
+        if (!Utils.isUnsupportedVersion()) {
+            if (getConfig().getString("mentionType").contains("BOSSBAR")) {
+                new MentionTypeBossbarHandler(mentioner, mentioned, plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "BOSSBAR"));
+            }
+            if (getConfig().getString("mentionType").contains("ACTIONBAR")) {
+                new MentionTypeActionbarHandler(mentioner, mentioned, plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, mentioned, "ACTIONBAR"));
+            }
         }
         nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
     }
