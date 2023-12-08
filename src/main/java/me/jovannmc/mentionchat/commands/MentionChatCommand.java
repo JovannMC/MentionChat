@@ -152,7 +152,7 @@ public class MentionChatCommand implements CommandExecutor {
 
         if (args[1].equalsIgnoreCase("toggle")) {
             if (args.length != 3) {
-                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings toggle " + (Utils.isLegacyVersion() ? "<mentions/format/message/title>" : "<mentions/format/message/title/bossbar>"));
+                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings toggle " + (Utils.isLegacyVersion() ? "<mentions/format/message/title>" : "<mentions/format/message/title/bossbar/actionbar>"));
                 return;
             }
 
@@ -180,7 +180,7 @@ public class MentionChatCommand implements CommandExecutor {
                 Utils.sendMessage(sender, prefix + " &aToggled " + toggle + " " + toggleValue + ".");
                 return;
             }
-            Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings toggle " + (Utils.isLegacyVersion() ? "<mentions/format/message/title>" : "<mentions/format/message/title/bossbar>"));
+            Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings toggle " + (Utils.isLegacyVersion() ? "<mentions/format/message/title>" : "<mentions/format/message/title/bossbar/actionbar>"));
         } else if (args[1].equalsIgnoreCase("sound")) {
             if (args.length != 3) {
                 Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings sound <sound>");

@@ -130,7 +130,9 @@ public class MentionTypeFormatHandler {
             finalMessage.addExtra(quickMention);
             finalMessage.addExtra(" " + newMessage);
 
-            mentionedPlayer.spigot().sendMessage(finalMessage);
+            if (data.getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle.format") || (data.get(mentionedPlayer.getUniqueId().toString() + ".toggle.format") == null && config.getString("mentionType").contains("FORMAT"))) {
+                mentionedPlayer.spigot().sendMessage(finalMessage);
+            }
         }
     }
 
