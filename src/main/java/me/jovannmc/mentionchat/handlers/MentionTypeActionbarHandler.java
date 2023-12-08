@@ -48,7 +48,6 @@ public class MentionTypeActionbarHandler {
 
         for (Player mentionedPlayer : mentioned) {
             if (data.getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle.actionbar") || (data.get(mentionedPlayer.getUniqueId().toString() + ".toggle.actionbar") == null && config.getString("mentionType").contains("ACTIONBAR"))) {
-                System.out.println("Player " + mentionedPlayer.getName() + " has actionbar toggled off");
                 plugin.playMentionSound(mentionedPlayer);
                 sendActionbar(mentionedPlayer, message);
             }

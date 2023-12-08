@@ -80,7 +80,6 @@ public class MentionTypeTitleHandler {
         // send title
         for (Player mentionedPlayer : mentioned) {
             if (data.getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle.title") || (data.get(mentionedPlayer.getUniqueId().toString() + ".toggle.title") == null && config.getString("mentionType").contains("TITLE"))) {
-                System.out.println("Player " + mentionedPlayer.getName() + " has title toggled on");
                 plugin.playMentionSound(mentionedPlayer);
                 sendTitle(mentionedPlayer, title, subtitle, duration);
             }

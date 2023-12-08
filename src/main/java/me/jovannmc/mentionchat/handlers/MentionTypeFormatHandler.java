@@ -61,7 +61,6 @@ public class MentionTypeFormatHandler {
                 clonedMessage.addExtra(" " + e.getMessage());
                 player.spigot().sendMessage(clonedMessage);
                 sentMessages.add(player);
-                System.out.println("Sent message to " + player.getName());
             }
         }
 

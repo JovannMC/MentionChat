@@ -78,7 +78,6 @@ public class MentionTypeBossbarHandler {
 
         for (Player mentionedPlayer : mentioned) {
             if (data.getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle.bossbar") || (data.get(mentionedPlayer.getUniqueId().toString() + ".toggle.bossbar") == null && config.getString("mentionType").contains("BOSSBAR"))) {
-                System.out.println("Player " + mentionedPlayer.getName() + " has bossbar toggled on");
                 plugin.playMentionSound(mentionedPlayer);
                 sendBossbar(plugin, mentionedPlayer, message, color, duration);
             }

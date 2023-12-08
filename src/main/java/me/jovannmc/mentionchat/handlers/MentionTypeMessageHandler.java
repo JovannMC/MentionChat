@@ -44,7 +44,6 @@ public class MentionTypeMessageHandler {
 
     // Mention multiple users
     public MentionTypeMessageHandler(AsyncPlayerChatEvent e, HashSet<Player> mentioned, MentionChat plugin) {
-        System.out.println("Mentioning multiple users on MentionTypeMessageHandler");
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
         Player mentioner = e.getPlayer();
