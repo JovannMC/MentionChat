@@ -15,6 +15,7 @@ public class MentionTypeActionbarHandler {
 
     // Mention Users
     public MentionTypeActionbarHandler(Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
+        System.out.println("MentionTypeActionbarHandler");
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 
@@ -29,6 +30,7 @@ public class MentionTypeActionbarHandler {
         for (Player mentionedPlayer : mentioned) {
             plugin.playMentionSound(mentionedPlayer);
             sendActionbar(mentionedPlayer, message);
+            System.out.println("send actionbar to " + mentionedPlayer.getName());
         }
     }
 

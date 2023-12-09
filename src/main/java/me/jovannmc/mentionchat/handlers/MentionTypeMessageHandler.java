@@ -13,6 +13,7 @@ public class MentionTypeMessageHandler {
 
     // Mention Users
     public MentionTypeMessageHandler(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
+        System.out.println("MentionTypeMessageHandler for users");
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 
@@ -37,6 +38,7 @@ public class MentionTypeMessageHandler {
 
                 if (plugin.getData().get(mentionedPlayer.getUniqueId().toString() + ".toggle.format") != null && !plugin.getData().getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle.format")) {
                     mentionedPlayer.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+                    System.out.println("send message to " + mentionedPlayer.getName());
                 }
             }
         }
@@ -45,12 +47,14 @@ public class MentionTypeMessageHandler {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (!mentioned.contains(player) && plugin.getData().get(player.getUniqueId().toString() + ".toggle.format") != null && !plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.format")) {
                 player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+                System.out.println("send normal to " + player.getName());
             }
         }
     }
 
     // Mention everyone
     public MentionTypeMessageHandler(AsyncPlayerChatEvent e, Player mentioner, MentionChat plugin) {
+        System.out.println("MentionTypeMessageHandler for everyone");
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 
@@ -75,6 +79,7 @@ public class MentionTypeMessageHandler {
 
                 if (plugin.getData().get(player.getUniqueId().toString() + ".toggle.format") != null && !plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.format")) {
                     player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+                    System.out.println("send message to " + player.getName());
                 }
             }
         }

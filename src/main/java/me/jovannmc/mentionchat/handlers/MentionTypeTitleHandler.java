@@ -17,6 +17,7 @@ public class MentionTypeTitleHandler {
 
     // Mention Users
     public MentionTypeTitleHandler(Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
+        System.out.println("MentionTypeTitleHandler for users");
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 
@@ -51,6 +52,7 @@ public class MentionTypeTitleHandler {
 
     // Mention everyone
     public MentionTypeTitleHandler(Player mentioner, MentionChat plugin) {
+        System.out.println("MentionTypeTitleHandler for everyone");
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 
@@ -88,11 +90,13 @@ public class MentionTypeTitleHandler {
         for (String legacyVersion : legacyVersions) {
             if (Utils.getServerVersion().startsWith(legacyVersion)) {
                 sendTitleLegacy(player, title, subtitle, stayTime);
+                System.out.println("send legacy title to " + player.getName());
                 return;
             }
         }
 
         player.sendTitle(Utils.color(title), Utils.color(subtitle), 10, stayTime * 20, 20);
+        System.out.println("send title to " + player.getName());
     }
 
     // For versions 1.10 and 1.9

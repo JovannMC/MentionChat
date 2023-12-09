@@ -15,8 +15,11 @@ import java.util.HashSet;
 
 public class MentionTypeBossbarHandler {
 
+    // TODO: prevent multiple bossbars from being sent to the same player
+
     // Mention Users
     public MentionTypeBossbarHandler(Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
+        System.out.println("MentionTypeBossbarHandler for users");
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 
@@ -50,6 +53,7 @@ public class MentionTypeBossbarHandler {
 
     // Mention everyone
     public MentionTypeBossbarHandler(Player mentioner, MentionChat plugin) {
+        System.out.println("MentionTypeBossbarHandler for everyone");
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 
@@ -82,6 +86,7 @@ public class MentionTypeBossbarHandler {
     }
 
     private void sendBossbar(MentionChat plugin, Player player, String message, String color, int duration) {
+        System.out.println("send bossbar to " + player.getName());
         BossBar bossBar = Bukkit.createBossBar(Utils.color(message.replace("%player%", player.getName())), BarColor.valueOf(color), BarStyle.SEGMENTED_10);
         bossBar.addPlayer(player);
 

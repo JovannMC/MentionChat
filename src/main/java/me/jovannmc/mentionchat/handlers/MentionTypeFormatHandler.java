@@ -17,6 +17,7 @@ public class MentionTypeFormatHandler {
 
     // Mention users
     public MentionTypeFormatHandler(AsyncPlayerChatEvent e, HashSet<Player> mentioned, MentionChat plugin) {
+        System.out.println("MentionTypeFormatHandler for users");
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 
@@ -62,6 +63,7 @@ public class MentionTypeFormatHandler {
                     clonedMessage.addExtra(" " + e.getMessage());
                     player.spigot().sendMessage(clonedMessage);
                     sentMessages.add(player);
+                    System.out.println("send normal message to " + player.getName());
                 }
             }
 
@@ -72,11 +74,13 @@ public class MentionTypeFormatHandler {
             finalMessage.addExtra(" " + newMessage);
 
             mentionedPlayer.spigot().sendMessage(finalMessage);
+            System.out.println("send message to " + mentionedPlayer.getName());
         }
     }
 
     // Mention everyone
     public MentionTypeFormatHandler(AsyncPlayerChatEvent e, MentionChat plugin) {
+        System.out.println("MentionTypeFormatHandler for everyone");
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 
@@ -115,6 +119,7 @@ public class MentionTypeFormatHandler {
             finalMessage.addExtra(" " + newMessage);
 
             p.spigot().sendMessage(finalMessage);
+            System.out.println("send message to " + p.getName());
 
             plugin.playMentionSound(p);
         }

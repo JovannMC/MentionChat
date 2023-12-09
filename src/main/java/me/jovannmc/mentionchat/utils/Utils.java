@@ -25,7 +25,7 @@ public class Utils {
     }
 
     public static boolean isUnsupportedVersion() {
-        String[] unsupportedVersions = {"v1_8", "v1_7", "v1_6", "v1_5", "v1_4", "v1_3", "v1_2"};
+        String[] unsupportedVersions = {"v1_8", "v1_7", "v1_6", "v1_5", "v1_4", "v1_3"};
         for (String unsupportedVersion : unsupportedVersions) {
             if (getServerVersion().startsWith(unsupportedVersion)) {
                 return true;
@@ -35,7 +35,7 @@ public class Utils {
     }
 
     public static boolean isOldVersion() {
-        String[] oldVersions = {"v1_11", "v1_10", "v1_9", "v1_8", "v1_7", "v1_6", "v1_5", "v1_4", "v1_3", "v1_2"};
+        String[] oldVersions = {"v1_11", "v1_10", "v1_9", "v1_8", "v1_7", "v1_6", "v1_5", "v1_4", "v1_3"};
         for (String oldVersion : oldVersions) {
             if (getServerVersion().startsWith(oldVersion)) {
                 return true;

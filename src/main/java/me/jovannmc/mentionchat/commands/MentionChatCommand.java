@@ -152,13 +152,13 @@ public class MentionChatCommand implements CommandExecutor {
 
         if (args[1].equalsIgnoreCase("toggle")) {
             if (args.length != 3) {
-                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings toggle " + (Utils.isLegacyVersion() ? "<mentions/format/message/title>" : "<mentions/format/message/title/bossbar>"));
+                Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings toggle " + (Utils.isLegacyVersion() ? "<mentions/format/message/title>" : "<mentions/format/message/title/bossbar/actionbar>"));
                 return;
             }
 
             // Instead of using a lot of if statements, we can just check if the argument is in the array and adjust accordingly
             // haha more efficient!! (i think??)
-            String[] allowedToggles = Utils.isLegacyVersion() ? new String[]{"mentions", "format", "message"} : new String[]{"mentions", "format", "message", "title", "actionbar", "bossbar"};
+            String[] allowedToggles = Utils.isLegacyVersion() ? new String[]{"mentions", "format", "message", "title"} : new String[]{"mentions", "format", "message", "title", "actionbar", "bossbar"};
             if (Arrays.asList(allowedToggles).contains(args[2].toLowerCase())) {
                 String toggle = args[2].toLowerCase();
                 // if player has the toggle in data file, set to opposite
@@ -180,7 +180,7 @@ public class MentionChatCommand implements CommandExecutor {
                 Utils.sendMessage(sender, prefix + " &aToggled " + toggle + " " + toggleValue + ".");
                 return;
             }
-            Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings toggle " + (Utils.isLegacyVersion() ? "<mentions/format/message/title>" : "<mentions/format/message/title/bossbar>"));
+            Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings toggle " + (Utils.isLegacyVersion() ? "<mentions/format/message/title>" : "<mentions/format/message/title/bossbar/actionbar>"));
         } else if (args[1].equalsIgnoreCase("sound")) {
             if (args.length != 3) {
                 Utils.sendMessage(sender, "&cInvalid usage. /mentionchat settings sound <sound>");
