@@ -127,25 +127,35 @@ public class MentionHandler implements Listener {
 
         // Check mention type and handle mention accordingly
         if (!formatEnabled.isEmpty()) {
-            new MentionTypeFormatHandler(e, formatEnabled, plugin);
-            Bukkit.getServer().getScheduler().runTask(plugin, () -> Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, formatEnabled, "FORMAT")));
+            Bukkit.getServer().getScheduler().runTask(plugin, () -> {
+                new MentionTypeFormatHandler(e, formatEnabled, plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, formatEnabled, "FORMAT"));
+            });
         }
         if (!messageEnabled.isEmpty()) {
-            new MentionTypeMessageHandler(e, mentioner, messageEnabled, plugin);
-            Bukkit.getServer().getScheduler().runTask(plugin, () -> Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, messageEnabled, "MESSAGE")));
+            Bukkit.getServer().getScheduler().runTask(plugin, () -> {
+                new MentionTypeMessageHandler(e, mentioner, messageEnabled, plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, messageEnabled, "MESSAGE"));
+            });
         }
         if (!titleEnabled.isEmpty()) {
-            new MentionTypeTitleHandler(mentioner, titleEnabled, plugin);
-            Bukkit.getServer().getScheduler().runTask(plugin, () -> Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, titleEnabled, "TITLE")));
+            Bukkit.getServer().getScheduler().runTask(plugin, () -> {
+                new MentionTypeTitleHandler(mentioner, titleEnabled, plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, titleEnabled, "TITLE"));
+            });
         }
         if (!Utils.isUnsupportedVersion()) {
             if (!bossbarEnabled.isEmpty()) {
-                new MentionTypeBossbarHandler(mentioner, bossbarEnabled, plugin);
-                Bukkit.getServer().getScheduler().runTask(plugin, () -> Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, bossbarEnabled, "BOSSBAR")));
+                Bukkit.getServer().getScheduler().runTask(plugin, () -> {
+                    new MentionTypeBossbarHandler(mentioner, bossbarEnabled, plugin);
+                    Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, bossbarEnabled, "BOSSBAR"));
+                });
             }
             if (!actionbarEnabled.isEmpty()) {
-                new MentionTypeActionbarHandler(mentioner, actionbarEnabled, plugin);
-                Bukkit.getServer().getScheduler().runTask(plugin, () -> Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, actionbarEnabled, "ACTIONBAR")));
+                Bukkit.getServer().getScheduler().runTask(plugin, () -> {
+                    new MentionTypeActionbarHandler(mentioner, actionbarEnabled, plugin);
+                    Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, actionbarEnabled, "ACTIONBAR"));
+                });
             }
         }
         nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
