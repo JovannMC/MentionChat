@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public class MentionTypeFormatHandler {
 
@@ -84,8 +85,8 @@ public class MentionTypeFormatHandler {
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
 
-        // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
-        e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
+        // Create a new set to store the modified recipients
+        Set<Player> recipients = new HashSet<>(e.getRecipients());
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             String mentionSymbol = config.getString("mentionSymbol");
@@ -118,12 +119,18 @@ public class MentionTypeFormatHandler {
             finalMessage.addExtra(quickMention);
             finalMessage.addExtra(" " + newMessage);
 
+            // Use the modifiedRecipients set to send the message
             p.spigot().sendMessage(finalMessage);
             System.out.println("send message to " + p.getName());
 
             plugin.playMentionSound(p);
         }
+
+        // Set the modified recipients back to the event
+        e.getRecipients().clear();
+        e.getRecipients().addAll(recipients);
     }
+
 
 
 }
