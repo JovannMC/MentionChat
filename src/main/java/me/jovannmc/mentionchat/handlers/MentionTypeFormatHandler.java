@@ -17,7 +17,7 @@ import java.util.Set;
 public class MentionTypeFormatHandler {
 
     // Mention users
-    public MentionTypeFormatHandler(AsyncPlayerChatEvent e, HashSet<Player> mentioned, boolean isEveryone, MentionChat plugin) {
+    public MentionTypeFormatHandler(AsyncPlayerChatEvent e, HashSet<Player> mentioned, MentionChat plugin) {
         System.out.println("MentionTypeFormatHandler for users");
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
