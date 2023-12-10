@@ -3,7 +3,6 @@ package me.jovannmc.mentionchat.events;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.HashSet;
 
@@ -14,12 +13,12 @@ public class PlayerMentionEvent extends Event {
     private boolean isCancelled;
 
     private Player mentioner;
-    private Player mentionedPlayer;
+    private HashSet<Player> mentionedPlayers;
     private String mentionType;
 
-    public PlayerMentionEvent(AsyncPlayerChatEvent e, Player mentionedPlayer, String mentionType) {
-        this.mentioner = e.getPlayer();
-        this.mentionedPlayer = mentionedPlayer;
+    public PlayerMentionEvent(Player mentioner, HashSet<Player> mentionedPlayers, String mentionType) {
+        this.mentioner = mentioner;
+        this.mentionedPlayers = mentionedPlayers;
         this.mentionType = mentionType;
     }
 
@@ -46,8 +45,8 @@ public class PlayerMentionEvent extends Event {
         return this.mentioner;
     }
 
-    public Player getMentionedPlayer() {
-        return this.mentionedPlayer;
+    public HashSet<Player> getMentionedPlayers() {
+        return this.mentionedPlayers;
     }
 
     public String getMentionType() {
