@@ -17,7 +17,7 @@ import java.util.Set;
 public class MentionTypeFormatHandler {
 
     // Mention users
-    public MentionTypeFormatHandler(AsyncPlayerChatEvent e, HashSet<Player> mentioned, MentionChat plugin) {
+    public MentionTypeFormatHandler(AsyncPlayerChatEvent e, HashSet<Player> mentioned, boolean isEveryone, MentionChat plugin) {
         System.out.println("MentionTypeFormatHandler for users");
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
@@ -78,59 +78,5 @@ public class MentionTypeFormatHandler {
             System.out.println("send message to " + mentionedPlayer.getName());
         }
     }
-
-    // Mention everyone
-    public MentionTypeFormatHandler(AsyncPlayerChatEvent e, MentionChat plugin) {
-        System.out.println("MentionTypeFormatHandler for everyone");
-        FileConfiguration config = plugin.getConfig();
-        FileConfiguration data = plugin.getData();
-
-        // Create a new set to store the modified recipients
-        Set<Player> recipients = new HashSet<>(e.getRecipients());
-
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            String mentionSymbol = config.getString("mentionSymbol");
-            String mentionPattern = "(?i)" + mentionSymbol + "everyone\\b";
-            String mentionMessage;
-
-            if (data.contains(p.getUniqueId().toString() + ".format")) {
-                mentionMessage = ChatColor.translateAlternateColorCodes('&', data.getString(p.getUniqueId().toString() + ".format").replace("%mention%", mentionSymbol + "everyone"));
-            } else {
-                mentionMessage = ChatColor.translateAlternateColorCodes('&', config.getString("mentionedFormat").replace("%mention%", mentionSymbol + "everyone"));
-            }
-
-            // Like previously, we split the message into words so that it has to be @everyone, and also case-insensitive
-            String[] words = e.getMessage().split("\\s+");
-            StringBuilder newMessageBuilder = new StringBuilder();
-            for (String word : words) {
-                if (word.matches(mentionPattern)) {
-                    newMessageBuilder.append(" ").append(mentionMessage);
-                } else {
-                    newMessageBuilder.append(" ").append(word);
-                }
-            }
-            String newMessage = newMessageBuilder.toString().trim();
-
-            TextComponent quickMention = new TextComponent("<" + e.getPlayer().getDisplayName() + ">");
-            quickMention.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Mention " + e.getPlayer().getName()).create()));
-            quickMention.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, mentionSymbol + e.getPlayer().getName()));
-
-            TextComponent finalMessage = new TextComponent("");
-            finalMessage.addExtra(quickMention);
-            finalMessage.addExtra(" " + newMessage);
-
-            // Use the modifiedRecipients set to send the message
-            p.spigot().sendMessage(finalMessage);
-            System.out.println("send message to " + p.getName());
-
-            plugin.playMentionSound(p);
-        }
-
-        // Set the modified recipients back to the event
-        e.getRecipients().clear();
-        e.getRecipients().addAll(recipients);
-    }
-
-
 
 }

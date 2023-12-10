@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class MentionTypeMessageHandler {
 
-    // Mention Users
+    // Mention users/everyone
     public MentionTypeMessageHandler(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
         System.out.println("MentionTypeMessageHandler for users");
         FileConfiguration config = plugin.getConfig();
@@ -45,40 +45,9 @@ public class MentionTypeMessageHandler {
         }
 
         for (Player player : recipients) {
-            player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
-            System.out.println("send normal to " + player.getName());
-        }
-    }
-
-    // Mention everyone
-    public MentionTypeMessageHandler(AsyncPlayerChatEvent e, Player mentioner, MentionChat plugin) {
-        System.out.println("MentionTypeMessageHandler for everyone");
-        FileConfiguration config = plugin.getConfig();
-        FileConfiguration data = plugin.getData();
-
-        // Remove all recipients to send custom messages to each player, but lets the message still be logged in the console
-        e.getRecipients().removeAll(Bukkit.getOnlinePlayers());
-
-        // We use a HashSet here to track which players have already been sent a message, to prevent duplicate messages
-        HashSet<Player> sentMessages = new HashSet<>();
-
-        // Send the message to each player
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (!sentMessages.contains(player)) {
-                // Add the player to the HashSet, so they don't get sent the same message multiple times
-                sentMessages.add(player);
-                plugin.playMentionSound(player);
-
-                if (data.contains(player.getUniqueId().toString() + ".message")) {
-                    Utils.sendMessage(player, data.getString(player.getUniqueId().toString() + ".message").replace("%player%", mentioner.getName()));
-                } else {
-                    Utils.sendMessage(player, config.getString("mentionedMessage").replace("%player%", mentioner.getName()));
-                }
-
-                if (plugin.getData().get(player.getUniqueId().toString() + ".toggle.format") != null && !plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.format")) {
-                    player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
-                    System.out.println("send message to " + player.getName());
-                }
+            if (!plugin.getConfig().getString("mentionType").toUpperCase().contains("FORMAT") | !plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.format")) {
+                player.sendMessage(e.getFormat().replace("%1$s", mentioner.getDisplayName()).replace("%2$s", e.getMessage()));
+                System.out.println("send normal to " + player.getName());
             }
         }
     }

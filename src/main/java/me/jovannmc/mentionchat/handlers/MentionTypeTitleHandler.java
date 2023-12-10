@@ -15,7 +15,7 @@ import java.util.logging.Level;
 
 public class MentionTypeTitleHandler {
 
-    // Mention Users
+    // Mention users/everyone
     public MentionTypeTitleHandler(Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
         System.out.println("MentionTypeTitleHandler for users");
         FileConfiguration config = plugin.getConfig();
@@ -50,44 +50,9 @@ public class MentionTypeTitleHandler {
         }
     }
 
-    // Mention everyone
-    public MentionTypeTitleHandler(Player mentioner, MentionChat plugin) {
-        System.out.println("MentionTypeTitleHandler for everyone");
-        FileConfiguration config = plugin.getConfig();
-        FileConfiguration data = plugin.getData();
-
-        // Get the title and subtitle from user data, if not found, use the default title and subtitle from config and then send the title/subtitle to player
-        String title;
-        String subtitle;
-        int duration;
-        if (data.contains(mentioner.getUniqueId().toString() + ".title.title")) {
-            title = ChatColor.translateAlternateColorCodes('&', data.getString(mentioner.getUniqueId().toString() + ".title.title").replace("%player%", mentioner.getName()));
-        } else {
-            title = ChatColor.translateAlternateColorCodes('&', config.getString(".mentionedTitle").replace("%player%", mentioner.getName()));
-        }
-
-        if (data.contains(mentioner.getUniqueId().toString() + ".title.subtitle")) {
-            subtitle = ChatColor.translateAlternateColorCodes('&', data.getString(mentioner.getUniqueId().toString() + ".title.subtitle").replace("%player%", mentioner.getName()));
-        } else {
-            subtitle = ChatColor.translateAlternateColorCodes('&', config.getString(".mentionedSubtitle").replace("%player%", mentioner.getName()));
-        }
-
-        if (data.contains(mentioner.getUniqueId().toString() + ".duration")) {
-            duration = data.getInt(mentioner.getUniqueId().toString() + ".duration");
-        } else {
-            duration = config.getInt("mentionedDuration");
-        }
-
-        // send title
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            plugin.playMentionSound(player);
-            sendTitle(player, title, subtitle, duration);
-        }
-    }
-
     public void sendTitle(Player player, String title, String subtitle, int stayTime) {
-        String[] legacyVersions = {"v1_10", "v1_9"};
-        for (String legacyVersion : legacyVersions) {
+        String[] nmsVersions = {"v1_10", "v1_9"};
+        for (String legacyVersion : nmsVersions) {
             if (Utils.getServerVersion().startsWith(legacyVersion)) {
                 sendTitleLegacy(player, title, subtitle, stayTime);
                 System.out.println("send legacy title to " + player.getName());

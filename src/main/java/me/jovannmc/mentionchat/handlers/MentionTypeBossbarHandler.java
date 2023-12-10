@@ -17,7 +17,7 @@ public class MentionTypeBossbarHandler {
 
     // TODO: prevent multiple bossbars from being sent to the same player
 
-    // Mention Users
+    // Mention users/everyone
     public MentionTypeBossbarHandler(Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
         System.out.println("MentionTypeBossbarHandler for users");
         FileConfiguration config = plugin.getConfig();
@@ -48,40 +48,6 @@ public class MentionTypeBossbarHandler {
         for (Player mentionedPlayer : mentioned) {
             plugin.playMentionSound(mentionedPlayer);
             sendBossbar(plugin, mentionedPlayer, message, color, duration);
-        }
-    }
-
-    // Mention everyone
-    public MentionTypeBossbarHandler(Player mentioner, MentionChat plugin) {
-        System.out.println("MentionTypeBossbarHandler for everyone");
-        FileConfiguration config = plugin.getConfig();
-        FileConfiguration data = plugin.getData();
-
-        String message;
-        String color;
-        int duration;
-
-        if (data.contains(mentioner.getUniqueId().toString() + ".bossbar.text")) {
-            message = ChatColor.translateAlternateColorCodes('&', data.getString(mentioner.getUniqueId().toString() + ".bossbar.text").replace("%player%", mentioner.getName()));
-        } else {
-            message = ChatColor.translateAlternateColorCodes('&', config.getString(".mentionedBossbar"));
-        }
-
-        if (data.contains(mentioner.getUniqueId().toString() + ".bossbar.color")) {
-            color = ChatColor.translateAlternateColorCodes('&', data.getString(mentioner.getUniqueId().toString() + ".bossbar.color"));
-        } else {
-            color = ChatColor.translateAlternateColorCodes('&', config.getString(".mentionedBossbarColor"));
-        }
-
-        if (data.contains(mentioner.getUniqueId().toString() + ".duration")) {
-            duration = data.getInt(mentioner.getUniqueId().toString() + ".duration");
-        } else {
-            duration = config.getInt("mentionedDuration");
-        }
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            plugin.playMentionSound(player);
-            sendBossbar(plugin, player, message, color, duration);
         }
     }
 

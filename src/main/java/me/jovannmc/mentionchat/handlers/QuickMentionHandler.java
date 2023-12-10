@@ -47,5 +47,4 @@ public class QuickMentionHandler implements Listener {
     public void onPlayerMention(PlayerMentionEvent event) {
         mentionEventOccurred = true;
     }
-
 }

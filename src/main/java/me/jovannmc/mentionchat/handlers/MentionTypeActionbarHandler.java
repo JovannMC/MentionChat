@@ -13,7 +13,7 @@ import java.util.HashSet;
 
 public class MentionTypeActionbarHandler {
 
-    // Mention Users
+    // Mention users/everyone
     public MentionTypeActionbarHandler(Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
         System.out.println("MentionTypeActionbarHandler");
         FileConfiguration config = plugin.getConfig();
@@ -31,25 +31,6 @@ public class MentionTypeActionbarHandler {
             plugin.playMentionSound(mentionedPlayer);
             sendActionbar(mentionedPlayer, message);
             System.out.println("send actionbar to " + mentionedPlayer.getName());
-        }
-    }
-
-    // Mention everyone
-    public MentionTypeActionbarHandler(Player mentioner, MentionChat plugin) {
-        FileConfiguration config = plugin.getConfig();
-        FileConfiguration data = plugin.getData();
-
-        String message;
-
-        if (data.contains(mentioner.getUniqueId().toString() + ".actionbar")) {
-            message = ChatColor.translateAlternateColorCodes('&', data.getString(mentioner.getUniqueId().toString() + ".actionbar.text").replace("%player%", mentioner.getName()));
-        } else {
-            message = ChatColor.translateAlternateColorCodes('&', config.getString(".mentionedActionbar"));
-        }
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            plugin.playMentionSound(player);
-            sendActionbar(player, message);
         }
     }
 
