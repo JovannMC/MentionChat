@@ -1,8 +1,6 @@
 package me.jovannmc.mentionchat.handlers;
 
 import me.jovannmc.mentionchat.MentionChat;
-import me.jovannmc.mentionchat.events.EveryoneMentionEvent;
-import me.jovannmc.mentionchat.events.MultiPlayerMentionEvent;
 import me.jovannmc.mentionchat.events.PlayerMentionEvent;
 import me.jovannmc.mentionchat.utils.Utils;
 import org.bukkit.Bukkit;
@@ -61,11 +59,11 @@ public class MentionHandler implements Listener {
         }
     }
 
-    private void mentionUser(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentionedPlayers) {
+    private void mentionUser(AsyncPlayerChatEvent e, Player mentioner, HashSet<Player> mentioned) {
         // Check if player has mentions disabled
         List<Player> playersToRemove = new ArrayList<>();
         if (!mentioner.hasPermission("mentionchat.mention.bypass") || !mentioner.hasPermission("mentionchat.mention.bypass.toggle")) {
-            for (Player mentionedPlayer : mentionedPlayers) {
+            for (Player mentionedPlayer : mentioned) {
                 if (plugin.getData().contains(mentionedPlayer.getUniqueId().toString() + ".toggle.mentions") && !plugin.getData().getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle.mentions")) {
                     playersToRemove.add(mentionedPlayer);
                 } else if (mentionedPlayer.hasPermission("mentionchat.mention.exempt") && (!mentioner.hasPermission("mentionchat.mention.bypass.exempt") || !mentioner.hasPermission("mentionchat.mention.bypass"))) {
@@ -73,7 +71,7 @@ public class MentionHandler implements Listener {
                 }
             }
             if (!playersToRemove.isEmpty()) {
-                playersToRemove.forEach(mentionedPlayers::remove);
+                playersToRemove.forEach(mentioned::remove);
                 List<String> names = new ArrayList<>();
                 for (Player player : playersToRemove) {
                     names.add(player.getName());
@@ -97,117 +95,69 @@ public class MentionHandler implements Listener {
             }
         }
 
+        HashSet<Player> formatEnabled = new HashSet<>();
+        HashSet<Player> messageEnabled = new HashSet<>();
+        HashSet<Player> titleEnabled = new HashSet<>();
+        HashSet<Player> bossbarEnabled = new HashSet<>();
+        HashSet<Player> actionbarEnabled = new HashSet<>();
+
+        for (Player player : mentioned) {
+            System.out.println("player: " + player.getName());
+            if ((plugin.getData().contains(player.getUniqueId().toString() + ".toggle.format") && plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.format")) || getConfig().getString("mentionType").toUpperCase().contains("FORMAT")) {
+                formatEnabled.add(player);
+                System.out.println("format enabled for " + player.getName());
+            }
+            if ((plugin.getData().contains(player.getUniqueId().toString() + ".toggle.message") && plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.message")) || getConfig().getString("mentionType").toUpperCase().contains("MESSAGE")) {
+                messageEnabled.add(player);
+                System.out.println("message enabled for " + player.getName());
+            }
+            if ((plugin.getData().contains(player.getUniqueId().toString() + ".toggle.title") && plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.title")) || getConfig().getString("mentionType").toUpperCase().contains("TITLE")) {
+                titleEnabled.add(player);
+                System.out.println("title enabled for " + player.getName());
+            }
+            if ((plugin.getData().contains(player.getUniqueId().toString() + ".toggle.bossbar") && plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.bossbar")) || getConfig().getString("mentionType").toUpperCase().contains("BOSSBAR")) {
+                bossbarEnabled.add(player);
+                System.out.println("bossbar enabled for " + player.getName());
+            }
+            if ((plugin.getData().contains(player.getUniqueId().toString() + ".toggle.actionbar") && plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.actionbar")) || getConfig().getString("mentionType").toUpperCase().contains("ACTIONBAR")) {
+                actionbarEnabled.add(player);
+                System.out.println("actionbar enabled for " + player.getName());
+            }
+        }
+
         // Check mention type and handle mention accordingly
-
-        // Single player mentioned
-        if (mentionedPlayers.size() == 1) {
-            Player mentioned = mentionedPlayers.iterator().next();
-            String uuid = mentioned.getUniqueId().toString();
-
-            // Check player's data if mention type is toggled, if not found, check config for defaults
-            if ((plugin.getData().contains(uuid + ".toggle.format") && plugin.getData().getBoolean(uuid + ".toggle.format")) || (getConfig().getString("mentionType").contains("FORMAT") && !plugin.getData().contains(uuid + ".toggle.format"))) {
-                new MentionTypeFormatHandler(e, mentioned, plugin);
+        if (!formatEnabled.isEmpty()) {
+            Bukkit.getServer().getScheduler().runTask(plugin, () -> {
+                new MentionTypeFormatHandler(e, formatEnabled, plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, formatEnabled, "FORMAT"));
+            });
+        }
+        if (!messageEnabled.isEmpty()) {
+            Bukkit.getServer().getScheduler().runTask(plugin, () -> {
+                new MentionTypeMessageHandler(e, mentioner, messageEnabled, plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, messageEnabled, "MESSAGE"));
+            });
+        }
+        if (!titleEnabled.isEmpty()) {
+            Bukkit.getServer().getScheduler().runTask(plugin, () -> {
+                new MentionTypeTitleHandler(mentioner, titleEnabled, plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, titleEnabled, "TITLE"));
+            });
+        }
+        if (!Utils.isUnsupportedVersion()) {
+            if (!bossbarEnabled.isEmpty()) {
                 Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                    Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(e, mentioned, "FORMAT"));
+                    new MentionTypeBossbarHandler(mentioner, bossbarEnabled, plugin);
+                    Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, bossbarEnabled, "BOSSBAR"));
                 });
             }
-
-            if ((plugin.getData().getBoolean(uuid + ".toggle.message") && plugin.getData().getBoolean(uuid + ".toggle.message")) || (getConfig().getString("mentionType").contains("MESSAGE") && !plugin.getData().contains(uuid + ".toggle.message"))) {
-                new MentionTypeMessageHandler(e, mentioned, plugin);
+            if (!actionbarEnabled.isEmpty()) {
                 Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                    Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(e, mentioned, "MESSAGE"));
+                    new MentionTypeActionbarHandler(mentioner, actionbarEnabled, plugin);
+                    Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, actionbarEnabled, "ACTIONBAR"));
                 });
-            }
-
-            if ((plugin.getData().getBoolean(uuid + ".toggle.title") && plugin.getData().getBoolean(uuid + ".toggle.title")) || (getConfig().getString("mentionType").contains("TITLE") && !plugin.getData().contains(uuid + ".toggle.title"))) {
-                new MentionTypeTitleHandler(e, mentioned, plugin);
-                Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                    Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(e, mentioned, "TITLE"));
-                });
-            }
-
-            if (!Utils.isUnsupportedVersion()) {
-                if ((plugin.getData().getBoolean(uuid + ".toggle.bossbar") && plugin.getData().getBoolean(uuid + ".toggle.bossbar")) || (getConfig().getString("mentionType").contains("BOSSBAR") && !plugin.getData().contains(uuid + ".toggle.bossbar"))) {
-                    new MentionTypeBossbarHandler(e, mentioned, plugin);
-                    Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                        Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(e, mentioned, "BOSSBAR"));
-                    });
-                }
-
-                if ((plugin.getData().getBoolean(uuid + ".toggle.actionbar") && plugin.getData().getBoolean(uuid + ".toggle.actionbar")) || (getConfig().getString("mentionType").contains("ACTIONBAR") && !plugin.getData().contains(uuid + ".toggle.actionbar"))) {
-                    new MentionTypeActionbarHandler(e, mentioned, plugin);
-                    Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                        Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(e, mentioned, "ACTIONBAR"));
-                    });
-                }
             }
         }
-
-        boolean formatCalled = false;
-        boolean messageCalled = false;
-        boolean titleCalled = false;
-        boolean bossbarCalled = false;
-        boolean actionbarCalled = false;
-
-        // Multiple players mentioned
-        if (mentionedPlayers.size() > 1) {
-            for (Player mentioned : mentionedPlayers) {
-                String uuid = mentioned.getUniqueId().toString();
-                // Check player's data if mention type is toggled, if not found, check config for defaults
-                if ((plugin.getData().contains(uuid + ".toggle.format") && plugin.getData().getBoolean(uuid + ".toggle.format")) || (getConfig().getString("mentionType").contains("FORMAT") && !plugin.getData().contains(uuid + ".toggle.format"))) {
-                    if (!formatCalled) {
-                        new MentionTypeFormatHandler(e, mentionedPlayers, plugin);
-                        Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                            Bukkit.getPluginManager().callEvent(new MultiPlayerMentionEvent(e, mentionedPlayers, "FORMAT"));
-                        });
-                        formatCalled = true;
-                    }
-                }
-
-                if ((plugin.getData().getBoolean(uuid + ".toggle.message") && plugin.getData().getBoolean(uuid + ".toggle.message")) || (getConfig().getString("mentionType").contains("MESSAGE") && !plugin.getData().contains(uuid + ".toggle.message"))) {
-                    if (!messageCalled) {
-                        new MentionTypeMessageHandler(e, mentionedPlayers, plugin);
-                        Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                            Bukkit.getPluginManager().callEvent(new MultiPlayerMentionEvent(e, mentionedPlayers, "MESSAGE"));
-                        });
-                        messageCalled = true;
-                    }
-                }
-
-                if ((plugin.getData().getBoolean(uuid + ".toggle.title") && plugin.getData().getBoolean(uuid + ".toggle.title")) || (getConfig().getString("mentionType").contains("TITLE") && !plugin.getData().contains(uuid + ".toggle.title"))) {
-                    if (!titleCalled) {
-                        new MentionTypeTitleHandler(e, mentionedPlayers, plugin);
-                        Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                            Bukkit.getPluginManager().callEvent(new MultiPlayerMentionEvent(e, mentionedPlayers, "TITLE"));
-                        });
-                        titleCalled = true;
-                    }
-                }
-
-                if (!Utils.isUnsupportedVersion()) {
-                    if ((plugin.getData().getBoolean(uuid + ".toggle.bossbar") && plugin.getData().getBoolean(uuid + ".toggle.bossbar")) || (getConfig().getString("mentionType").contains("BOSSBAR") && !plugin.getData().contains(uuid + ".toggle.bossbar"))) {
-                        if (!bossbarCalled) {
-                            new MentionTypeBossbarHandler(e, mentionedPlayers, plugin);
-                            Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                                Bukkit.getPluginManager().callEvent(new MultiPlayerMentionEvent(e, mentionedPlayers, "BOSSBAR"));
-                            });
-                            bossbarCalled = true;
-                        }
-                    }
-
-                    if ((plugin.getData().getBoolean(uuid + ".toggle.actionbar") && plugin.getData().getBoolean(uuid + ".toggle.actionbar")) || (getConfig().getString("mentionType").contains("ACTIONBAR") && !plugin.getData().contains(uuid + ".toggle.actionbar"))) {
-                        if (!actionbarCalled) {
-                            new MentionTypeActionbarHandler(e, mentionedPlayers, plugin);
-                            Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                                Bukkit.getPluginManager().callEvent(new MultiPlayerMentionEvent(e, mentionedPlayers, "ACTIONBAR"));
-                            });
-                            actionbarCalled = true;
-                        }
-                    }
-                }
-            }
-        }
-
         nextMention.put(mentioner.getUniqueId(), System.currentTimeMillis());
     }
 
@@ -224,43 +174,66 @@ public class MentionHandler implements Listener {
             }
         }
 
-        HashSet<Player> onlinePlayers = new HashSet<>(Bukkit.getOnlinePlayers());
+        HashSet<Player> formatEnabled = new HashSet<>();
+        HashSet<Player> messageEnabled = new HashSet<>();
+        HashSet<Player> titleEnabled = new HashSet<>();
+        HashSet<Player> bossbarEnabled = new HashSet<>();
+        HashSet<Player> actionbarEnabled = new HashSet<>();
+
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (plugin.getData().contains(player.getUniqueId().toString() + ".toggle.mentions") && !plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.mentions")) {
-                onlinePlayers.remove(player);
+            System.out.println("everyone player: " + player.getName());
+            if ((plugin.getData().contains(player.getUniqueId().toString() + ".toggle.format") && plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.format")) || getConfig().getString("mentionType").toUpperCase().contains("FORMAT")) {
+                formatEnabled.add(player);
+                System.out.println("format enabled for " + player.getName());
+            }
+            if ((plugin.getData().contains(player.getUniqueId().toString() + ".toggle.message") && plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.message")) || getConfig().getString("mentionType").toUpperCase().contains("MESSAGE")) {
+                messageEnabled.add(player);
+                System.out.println("message enabled for " + player.getName());
+            }
+            if ((plugin.getData().contains(player.getUniqueId().toString() + ".toggle.title") && plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.title")) || getConfig().getString("mentionType").toUpperCase().contains("TITLE")) {
+                titleEnabled.add(player);
+                System.out.println("title enabled for " + player.getName());
+            }
+            if ((plugin.getData().contains(player.getUniqueId().toString() + ".toggle.bossbar") && plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.bossbar")) || getConfig().getString("mentionType").toUpperCase().contains("BOSSBAR")) {
+                bossbarEnabled.add(player);
+                System.out.println("bossbar enabled for " + player.getName());
+            }
+            if ((plugin.getData().contains(player.getUniqueId().toString() + ".toggle.actionbar") && plugin.getData().getBoolean(player.getUniqueId().toString() + ".toggle.actionbar")) || getConfig().getString("mentionType").toUpperCase().contains("ACTIONBAR")) {
+                actionbarEnabled.add(player);
+                System.out.println("actionbar enabled for " + player.getName());
             }
         }
 
-        // Check mention type and handle mention accordingly
-        if (getConfig().getString("mentionType").contains("FORMAT")) {
-            new MentionTypeFormatHandler(e, plugin);
+        /// Check mention type and handle mention accordingly
+        if (!formatEnabled.isEmpty()) {
             Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                Bukkit.getPluginManager().callEvent(new EveryoneMentionEvent(e, onlinePlayers, "FORMAT"));
+                new MentionTypeFormatHandler(e, new HashSet<>(formatEnabled), plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, new HashSet<>(formatEnabled), "FORMAT"));
             });
         }
-        if (getConfig().getString("mentionType").contains("MESSAGE")) {
-            new MentionTypeMessageHandler(e, plugin);
+        if (!messageEnabled.isEmpty()) {
             Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                Bukkit.getPluginManager().callEvent(new EveryoneMentionEvent(e, onlinePlayers, "MESSAGE"));
+                new MentionTypeMessageHandler(e, mentioner, new HashSet<>(messageEnabled), plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, new HashSet<>(messageEnabled), "MESSAGE"));
             });
         }
-        if (getConfig().getString("mentionType").contains("TITLE")) {
-            new MentionTypeTitleHandler(e, plugin);
+        if (!titleEnabled.isEmpty()) {
             Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                Bukkit.getPluginManager().callEvent(new EveryoneMentionEvent(e, onlinePlayers, "TITLE"));
+                new MentionTypeTitleHandler(mentioner, new HashSet<>(titleEnabled), plugin);
+                Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, new HashSet<>(titleEnabled), "TITLE"));
             });
         }
         if (!Utils.isUnsupportedVersion()) {
-            if (getConfig().getString("mentionType").contains("BOSSBAR")) {
-                new MentionTypeBossbarHandler(e, plugin);
+            if (!bossbarEnabled.isEmpty()) {
                 Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                    Bukkit.getPluginManager().callEvent(new EveryoneMentionEvent(e, onlinePlayers, "BOSSBAR"));
+                    new MentionTypeBossbarHandler(mentioner, new HashSet<>(bossbarEnabled), plugin);
+                    Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, new HashSet<>(bossbarEnabled), "BOSSBAR"));
                 });
             }
-            if (getConfig().getString("mentionType").contains("ACTIONBAR")) {
-                new MentionTypeActionbarHandler(e, plugin);
+            if (!actionbarEnabled.isEmpty()) {
                 Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                    Bukkit.getPluginManager().callEvent(new EveryoneMentionEvent(e, onlinePlayers, "ACTIONBAR"));
+                    new MentionTypeActionbarHandler(mentioner, new HashSet<>(actionbarEnabled), plugin);
+                    Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, new HashSet<>(actionbarEnabled), "ACTIONBAR"));
                 });
             }
         }

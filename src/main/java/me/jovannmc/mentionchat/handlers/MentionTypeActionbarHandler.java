@@ -8,35 +8,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.HashSet;
 
 public class MentionTypeActionbarHandler {
 
-    // Mention single user
-    public MentionTypeActionbarHandler(AsyncPlayerChatEvent e, Player mentioned, MentionChat plugin) {
+    // Mention users/everyone
+    public MentionTypeActionbarHandler(Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
+        System.out.println("MentionTypeActionbarHandler");
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
-        Player mentioner = e.getPlayer();
-
-        String message;
-
-        if (data.contains(mentioner.getUniqueId().toString() + ".actionbar")) {
-            message = ChatColor.translateAlternateColorCodes('&', data.getString(mentioner.getUniqueId().toString() + ".actionbar").replace("%player%", mentioner.getName()));
-        } else {
-            message = ChatColor.translateAlternateColorCodes('&', config.getString(".mentionedActionbar"));
-        }
-
-        plugin.playMentionSound(mentioned);
-        sendActionbar(mentioned, message);
-    }
-
-    // Mention multiple users
-    public MentionTypeActionbarHandler(AsyncPlayerChatEvent e, HashSet<Player> mentioned, MentionChat plugin) {
-        FileConfiguration config = plugin.getConfig();
-        FileConfiguration data = plugin.getData();
-        Player mentioner = e.getPlayer();
 
         String message;
 
@@ -47,30 +28,9 @@ public class MentionTypeActionbarHandler {
         }
 
         for (Player mentionedPlayer : mentioned) {
-            if (data.getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle.actionbar") || (data.get(mentionedPlayer.getUniqueId().toString() + ".toggle.actionbar") == null && config.getString("mentionType").contains("ACTIONBAR"))) {
-                plugin.playMentionSound(mentionedPlayer);
-                sendActionbar(mentionedPlayer, message);
-            }
-        }
-    }
-
-    // Mention everyone
-    public MentionTypeActionbarHandler(AsyncPlayerChatEvent e, MentionChat plugin) {
-        FileConfiguration config = plugin.getConfig();
-        FileConfiguration data = plugin.getData();
-        Player mentioner = e.getPlayer();
-
-        String message;
-
-        if (data.contains(mentioner.getUniqueId().toString() + ".actionbar")) {
-            message = ChatColor.translateAlternateColorCodes('&', data.getString(mentioner.getUniqueId().toString() + ".actionbar.text").replace("%player%", mentioner.getName()));
-        } else {
-            message = ChatColor.translateAlternateColorCodes('&', config.getString(".mentionedActionbar"));
-        }
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            plugin.playMentionSound(player);
-            sendActionbar(player, message);
+            plugin.playMentionSound(mentionedPlayer);
+            sendActionbar(mentionedPlayer, message);
+            System.out.println("send actionbar to " + mentionedPlayer.getName());
         }
     }
 

@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -16,44 +15,11 @@ import java.util.logging.Level;
 
 public class MentionTypeTitleHandler {
 
-    // Mention single user
-    public MentionTypeTitleHandler(AsyncPlayerChatEvent e, Player mentioned, MentionChat plugin) {
+    // Mention users/everyone
+    public MentionTypeTitleHandler(Player mentioner, HashSet<Player> mentioned, MentionChat plugin) {
+        System.out.println("MentionTypeTitleHandler for users");
         FileConfiguration config = plugin.getConfig();
         FileConfiguration data = plugin.getData();
-        Player mentioner = e.getPlayer();
-
-        // Get the title and subtitle from user data, if not found, use the default title and subtitle from config and then send the title/subtitle to player
-        String title;
-        String subtitle;
-        int duration;
-        if (data.contains(e.getPlayer().getUniqueId().toString() + ".title.title")) {
-            title = ChatColor.translateAlternateColorCodes('&', data.getString(mentioner.getUniqueId().toString() + ".title.title").replace("%player%", mentioner.getName()));
-        } else {
-            title = ChatColor.translateAlternateColorCodes('&', config.getString(".mentionedTitle").replace("%player%", mentioner.getName()));
-        }
-
-        if (data.contains(mentioner.getUniqueId().toString() + ".title.subtitle")) {
-            subtitle = ChatColor.translateAlternateColorCodes('&', data.getString(mentioner.getUniqueId().toString() + ".title.subtitle").replace("%player%", mentioner.getName()));
-        } else {
-            subtitle = ChatColor.translateAlternateColorCodes('&', config.getString(".mentionedSubtitle").replace("%player%", mentioner.getName()));
-        }
-
-        if (data.contains(mentioner.getUniqueId().toString() + ".duration")) {
-            duration = data.getInt(mentioner.getUniqueId().toString() + ".duration");
-        } else {
-            duration = config.getInt("mentionedDuration");
-        }
-
-        // send title
-        plugin.playMentionSound(mentioned);
-        sendTitle(mentioned, title, subtitle, duration);
-    }
-
-    // Mention multiple users
-    public MentionTypeTitleHandler(AsyncPlayerChatEvent e, HashSet<Player> mentioned, MentionChat plugin) {
-        FileConfiguration config = plugin.getConfig();
-        FileConfiguration data = plugin.getData();
-        Player mentioner = e.getPlayer();
 
         // Get the title and subtitle from user data, if not found, use the default title and subtitle from config and then send the title/subtitle to player
         String title;
@@ -79,58 +45,23 @@ public class MentionTypeTitleHandler {
 
         // send title
         for (Player mentionedPlayer : mentioned) {
-            if (data.getBoolean(mentionedPlayer.getUniqueId().toString() + ".toggle.title") || (data.get(mentionedPlayer.getUniqueId().toString() + ".toggle.title") == null && config.getString("mentionType").contains("TITLE"))) {
-                plugin.playMentionSound(mentionedPlayer);
-                sendTitle(mentionedPlayer, title, subtitle, duration);
-            }
-        }
-    }
-
-    // Mention everyone
-    public MentionTypeTitleHandler(AsyncPlayerChatEvent e, MentionChat plugin) {
-        FileConfiguration config = plugin.getConfig();
-        FileConfiguration data = plugin.getData();
-        Player mentioner = e.getPlayer();
-
-        // Get the title and subtitle from user data, if not found, use the default title and subtitle from config and then send the title/subtitle to player
-        String title;
-        String subtitle;
-        int duration;
-        if (data.contains(mentioner.getUniqueId().toString() + ".title.title")) {
-            title = ChatColor.translateAlternateColorCodes('&', data.getString(mentioner.getUniqueId().toString() + ".title.title").replace("%player%", mentioner.getName()));
-        } else {
-            title = ChatColor.translateAlternateColorCodes('&', config.getString(".mentionedTitle").replace("%player%", mentioner.getName()));
-        }
-
-        if (data.contains(mentioner.getUniqueId().toString() + ".title.subtitle")) {
-            subtitle = ChatColor.translateAlternateColorCodes('&', data.getString(mentioner.getUniqueId().toString() + ".title.subtitle").replace("%player%", mentioner.getName()));
-        } else {
-            subtitle = ChatColor.translateAlternateColorCodes('&', config.getString(".mentionedSubtitle").replace("%player%", mentioner.getName()));
-        }
-
-        if (data.contains(mentioner.getUniqueId().toString() + ".duration")) {
-            duration = data.getInt(mentioner.getUniqueId().toString() + ".duration");
-        } else {
-            duration = config.getInt("mentionedDuration");
-        }
-
-        // send title
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            plugin.playMentionSound(player);
-            sendTitle(player, title, subtitle, duration);
+            plugin.playMentionSound(mentionedPlayer);
+            sendTitle(mentionedPlayer, title, subtitle, duration);
         }
     }
 
     public void sendTitle(Player player, String title, String subtitle, int stayTime) {
-        String[] legacyVersions = {"v1_10", "v1_9"};
-        for (String legacyVersion : legacyVersions) {
+        String[] nmsVersions = {"v1_10", "v1_9"};
+        for (String legacyVersion : nmsVersions) {
             if (Utils.getServerVersion().startsWith(legacyVersion)) {
                 sendTitleLegacy(player, title, subtitle, stayTime);
+                System.out.println("send legacy title to " + player.getName());
                 return;
             }
         }
 
         player.sendTitle(Utils.color(title), Utils.color(subtitle), 10, stayTime * 20, 20);
+        System.out.println("send title to " + player.getName());
     }
 
     // For versions 1.10 and 1.9
