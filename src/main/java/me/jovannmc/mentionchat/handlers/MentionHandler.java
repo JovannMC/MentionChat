@@ -207,7 +207,7 @@ public class MentionHandler implements Listener {
         /// Check mention type and handle mention accordingly
         if (!formatEnabled.isEmpty()) {
             Bukkit.getServer().getScheduler().runTask(plugin, () -> {
-                new MentionTypeFormatHandler(e, new HashSet<>(formatEnabled), plugin);
+                new MentionTypeFormatHandler(e, plugin);
                 Bukkit.getPluginManager().callEvent(new PlayerMentionEvent(mentioner, new HashSet<>(formatEnabled), "FORMAT"));
             });
         }
